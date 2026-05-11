@@ -78,8 +78,11 @@ function DetalheAtendido() {
         <Section title="Dados principais" className="lg:col-span-2">
           <Grid>
             <Info k="Nome" v={r.nome} />
+            <Info k="ID externo" v={r.id_externo} />
+            <Info k="Matrícula" v={r.matricula_familia || r.matricula} />
+            <Info k="Gênero" v={r.genero} />
             <Info k="Nascimento" v={r.data_nascimento ? new Date(r.data_nascimento).toLocaleDateString("pt-BR") : "—"} />
-            <Info k="Idade" v={idade != null ? `${idade} anos` : "—"} />
+            <Info k="Idade" v={idade != null ? `${idade} anos` : (r.idade_importada != null ? `${r.idade_importada} anos (importada)` : "—")} />
             <Info k="CPF" v={
               <span className="font-mono inline-flex items-center gap-2">
                 {showCPF ? maskCPF(r.cpf) : hideCPF(r.cpf)}
