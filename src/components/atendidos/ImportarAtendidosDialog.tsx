@@ -36,8 +36,10 @@ const CAMPOS_DESTINO = [
 
 const ALIAS: Record<string, string> = {
   nome: "nome", nome_completo: "nome", "nome completo": "nome", participante: "nome",
-  id_atendido: "id_externo", id: "id_externo", codigo: "id_externo", codigo_origem: "id_externo", id_externo: "id_externo",
-  matricula: "matricula_familia", matricula_familia: "matricula_familia", "matrícula": "matricula_familia", "matrícula família": "matricula_familia",
+  nome_civil: "nome", "nome civil": "nome", nome_social: "nome", "nome social": "nome",
+  id_atendido: "id_externo", id: "id_externo", codigo: "id_externo", "código": "id_externo", codigo_origem: "id_externo", "código origem": "id_externo", id_externo: "id_externo",
+  matricula: "matricula_familia", matricula_familia: "matricula_familia", "matrícula": "matricula_familia", "matrícula família": "matricula_familia", "matrícula familia": "matricula_familia",
+  idade: "__ignore__",
   data_nascimento: "data_nascimento", "data de nascimento": "data_nascimento", nascimento: "data_nascimento", dt_nascimento: "data_nascimento",
   cpf: "cpf", rg: "rg",
   telefone: "telefone", celular: "telefone", fone: "telefone",
