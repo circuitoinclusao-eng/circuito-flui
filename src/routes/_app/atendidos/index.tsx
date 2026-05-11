@@ -119,6 +119,7 @@ function ListaAtendidos() {
     const inserts = Array.from(sel).map((atendido_id) => ({ atendido_id, grupo_id: id, status: "ativo", data_entrada: new Date().toISOString().slice(0, 10) }));
     const { error } = await supabase.from("atendido_projetos").insert(inserts);
     if (error) toast.error(error.message); else { toast.success("Adicionados ao grupo."); load(); setSel(new Set()); }
+  }
   async function excluirSelecionados() {
     if (!isAdmin) return;
     const ids = Array.from(sel);
