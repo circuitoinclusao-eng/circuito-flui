@@ -55,36 +55,79 @@ function Dashboard() {
   const [porCidade, setPorCidade] = useState<any[]>([]);
   const [porModalidade, setPorModalidade] = useState<any[]>([]);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [user?.id]);
 
   async function load() {
+    // Se for somente Professor, restringe às atividades em que está vinculado
+    let atividadeIds: string[] | null = null;
+    let atendidoIds: string[] | null = null;
+    let projetoIds: string[] | null = null;
+    if (isProfessorOnly && user?.id) {
+      const { data: vinc } = await supabase
+        .from("atividade_educadores").select("atividade_id").eq("usuario_id", user.id);
+      atividadeIds = (vinc ?? []).map((x: any) => x.atividade_id);
+      if (atividadeIds.length === 0) atividadeIds = ["00000000-0000-0000-0000-000000000000"];
+
+      const [{ data: ats }, { data: insc }] = await Promise.all([
+        supabase.from("atividades").select("projeto_id").in("id", atividadeIds),
+        supabase.from("atividade_inscritos").select("atendido_id").in("atividade_id", atividadeIds),
+      ]);
+      projetoIds = Array.from(new Set((ats ?? []).map((a: any) => a.projeto_id).filter(Boolean)));
+      atendidoIds = Array.from(new Set((insc ?? []).map((i: any) => i.atendido_id)));
+      if (atendidoIds.length === 0) atendidoIds = ["00000000-0000-0000-0000-000000000000"];
+    }
+
+    const qSemana = supabase.from("encontros_atividade")
+      .select("id,data,horario_inicio,status,atividade_id,atividades(titulo,tipo,local)")
+      .gte("data", semIni).lt("data", semFim).order("data");
+    if (atividadeIds) qSemana.in("atividade_id", atividadeIds);
+
+    const qPend = supabase.from("encontros_atividade")
+      .select("id,data,atividade_id,atividades(titulo)")
+      .eq("status", "nao_registrada").lt("data", iso(hoje)).order("data", { ascending: false }).limit(8);
+    if (atividadeIds) qPend.in("atividade_id", atividadeIds);
+
+    const qAtivos = supabase.from("atendidos").select("*", { count: "exact", head: true }).eq("status", "ativo");
+    if (atendidoIds) qAtivos.in("id", atendidoIds);
+
+    const qProjAtivos = supabase.from("projetos").select("*", { count: "exact", head: true })
+      .in("status", ["em_execucao", "aprovado"]);
+    if (projetoIds) projetoIds.length ? qProjAtivos.in("id", projetoIds) : qProjAtivos.eq("id", "00000000-0000-0000-0000-000000000000");
+
+    const qDocs = supabase.from("projetos")
+      .select("id,titulo,data_fim,situacao_prestacao_contas")
+      .in("situacao_prestacao_contas", ["em_elaboracao", "com_pendencia"]).limit(5);
+    if (projetoIds) projetoIds.length ? qDocs.in("id", projetoIds) : qDocs.eq("id", "00000000-0000-0000-0000-000000000000");
+
+    const qProjFim = supabase.from("projetos")
+      .select("id,titulo,data_fim,status")
+      .in("status", ["em_execucao", "aprovado"])
+      .gte("data_fim", iso(hoje)).lte("data_fim", iso(em30)).order("data_fim").limit(6);
+    if (projetoIds) projetoIds.length ? qProjFim.in("id", projetoIds) : qProjFim.eq("id", "00000000-0000-0000-0000-000000000000");
+
+    const qAniv = supabase.from("atendidos").select("id,nome,data_nascimento").not("data_nascimento", "is", null);
+    if (atendidoIds) qAniv.in("id", atendidoIds);
+
+    const qFaltas = supabase.from("presencas_atividade")
+      .select("atendido_id,presente,atendidos(nome),encontro_id,encontros_atividade!inner(atividade_id)")
+      .eq("presente", false).limit(2000);
+    if (atividadeIds) qFaltas.in("encontros_atividade.atividade_id", atividadeIds);
+
+    const qCidade = supabase.from("atendidos").select("cidade").eq("status", "ativo");
+    if (atendidoIds) qCidade.in("id", atendidoIds);
+
+    const qMod = supabase.from("atividades").select("tipo");
+    if (atividadeIds) qMod.in("id", atividadeIds);
+
+    const qPresMes = supabase.from("encontros_atividade")
+      .select("data,numero_presentes")
+      .gte("data", iso(new Date(hoje.getFullYear(), hoje.getMonth() - 5, 1)));
+    if (atividadeIds) qPresMes.in("atividade_id", atividadeIds);
+
     const [
       semana, pend, ativAtivos, projAtivos, docs, projFinal, aniv, faltasRows, cidadeRows, modRows, presMes,
     ] = await Promise.all([
-      supabase.from("encontros_atividade")
-        .select("id,data,horario_inicio,status,atividade_id,atividades(titulo,tipo,local)")
-        .gte("data", semIni).lt("data", semFim).order("data"),
-      supabase.from("encontros_atividade")
-        .select("id,data,atividade_id,atividades(titulo)")
-        .eq("status", "nao_registrada").lt("data", iso(hoje)).order("data", { ascending: false }).limit(8),
-      supabase.from("atendidos").select("*", { count: "exact", head: true }).eq("status", "ativo"),
-      supabase.from("projetos").select("*", { count: "exact", head: true }).in("status", ["em_execucao", "aprovado"]),
-      supabase.from("projetos")
-        .select("id,titulo,data_fim,situacao_prestacao_contas")
-        .in("situacao_prestacao_contas", ["em_elaboracao", "com_pendencia"]).limit(5),
-      supabase.from("projetos")
-        .select("id,titulo,data_fim,status")
-        .in("status", ["em_execucao", "aprovado"])
-        .gte("data_fim", iso(hoje)).lte("data_fim", iso(em30)).order("data_fim").limit(6),
-      supabase.from("atendidos").select("id,nome,data_nascimento").not("data_nascimento", "is", null),
-      supabase.from("presencas_atividade")
-        .select("atendido_id,presente,atendidos(nome)")
-        .eq("presente", false).limit(2000),
-      supabase.from("atendidos").select("cidade").eq("status", "ativo"),
-      supabase.from("atividades").select("tipo"),
-      supabase.from("encontros_atividade")
-        .select("data,numero_presentes")
-        .gte("data", iso(new Date(hoje.getFullYear(), hoje.getMonth() - 5, 1))),
+      qSemana, qPend, qAtivos, qProjAtivos, qDocs, qProjFim, qAniv, qFaltas, qCidade, qMod, qPresMes,
     ]);
 
     setEncontrosSemana(semana.data ?? []);
