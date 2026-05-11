@@ -13,6 +13,10 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppInicioRouteImport } from './routes/_app/inicio'
+import { Route as AppEditaisIndexRouteImport } from './routes/_app/editais/index'
+import { Route as AppEditaisNovoRouteImport } from './routes/_app/editais/novo'
+import { Route as AppEditaisIdIndexRouteImport } from './routes/_app/editais/$id/index'
+import { Route as AppEditaisIdEditarRouteImport } from './routes/_app/editais/$id/editar'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -33,16 +37,44 @@ const AppInicioRoute = AppInicioRouteImport.update({
   path: '/inicio',
   getParentRoute: () => AppRoute,
 } as any)
+const AppEditaisIndexRoute = AppEditaisIndexRouteImport.update({
+  id: '/editais/',
+  path: '/editais/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppEditaisNovoRoute = AppEditaisNovoRouteImport.update({
+  id: '/editais/novo',
+  path: '/editais/novo',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppEditaisIdIndexRoute = AppEditaisIdIndexRouteImport.update({
+  id: '/editais/$id/',
+  path: '/editais/$id/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppEditaisIdEditarRoute = AppEditaisIdEditarRouteImport.update({
+  id: '/editais/$id/editar',
+  path: '/editais/$id/editar',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/inicio': typeof AppInicioRoute
+  '/editais/novo': typeof AppEditaisNovoRoute
+  '/editais/': typeof AppEditaisIndexRoute
+  '/editais/$id/editar': typeof AppEditaisIdEditarRoute
+  '/editais/$id/': typeof AppEditaisIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/inicio': typeof AppInicioRoute
+  '/editais/novo': typeof AppEditaisNovoRoute
+  '/editais': typeof AppEditaisIndexRoute
+  '/editais/$id/editar': typeof AppEditaisIdEditarRoute
+  '/editais/$id': typeof AppEditaisIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -50,13 +82,40 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/_app/inicio': typeof AppInicioRoute
+  '/_app/editais/novo': typeof AppEditaisNovoRoute
+  '/_app/editais/': typeof AppEditaisIndexRoute
+  '/_app/editais/$id/editar': typeof AppEditaisIdEditarRoute
+  '/_app/editais/$id/': typeof AppEditaisIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/inicio'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/inicio'
+    | '/editais/novo'
+    | '/editais/'
+    | '/editais/$id/editar'
+    | '/editais/$id/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/inicio'
-  id: '__root__' | '/' | '/_app' | '/auth' | '/_app/inicio'
+  to:
+    | '/'
+    | '/auth'
+    | '/inicio'
+    | '/editais/novo'
+    | '/editais'
+    | '/editais/$id/editar'
+    | '/editais/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/auth'
+    | '/_app/inicio'
+    | '/_app/editais/novo'
+    | '/_app/editais/'
+    | '/_app/editais/$id/editar'
+    | '/_app/editais/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -95,15 +154,51 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInicioRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/editais/': {
+      id: '/_app/editais/'
+      path: '/editais'
+      fullPath: '/editais/'
+      preLoaderRoute: typeof AppEditaisIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/editais/novo': {
+      id: '/_app/editais/novo'
+      path: '/editais/novo'
+      fullPath: '/editais/novo'
+      preLoaderRoute: typeof AppEditaisNovoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/editais/$id/': {
+      id: '/_app/editais/$id/'
+      path: '/editais/$id'
+      fullPath: '/editais/$id/'
+      preLoaderRoute: typeof AppEditaisIdIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/editais/$id/editar': {
+      id: '/_app/editais/$id/editar'
+      path: '/editais/$id/editar'
+      fullPath: '/editais/$id/editar'
+      preLoaderRoute: typeof AppEditaisIdEditarRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
   AppInicioRoute: typeof AppInicioRoute
+  AppEditaisNovoRoute: typeof AppEditaisNovoRoute
+  AppEditaisIndexRoute: typeof AppEditaisIndexRoute
+  AppEditaisIdEditarRoute: typeof AppEditaisIdEditarRoute
+  AppEditaisIdIndexRoute: typeof AppEditaisIdIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppInicioRoute: AppInicioRoute,
+  AppEditaisNovoRoute: AppEditaisNovoRoute,
+  AppEditaisIndexRoute: AppEditaisIndexRoute,
+  AppEditaisIdEditarRoute: AppEditaisIdEditarRoute,
+  AppEditaisIdIndexRoute: AppEditaisIdIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -116,3 +211,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
