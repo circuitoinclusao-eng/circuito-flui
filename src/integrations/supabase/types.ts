@@ -1051,66 +1051,348 @@ export type Database = {
         }
         Relationships: []
       }
-      projetos: {
+      projeto_cronograma: {
         Row: {
-          cidade: string | null
           created_at: string
           data_fim: string | null
           data_inicio: string | null
           descricao: string | null
-          edital_id: string | null
+          etapa: string
           id: string
-          indicadores: string | null
-          metas: string | null
-          numero_projeto: string | null
-          objetivo_geral: string | null
-          objetivos_especificos: string | null
-          orcamento_previsto: number | null
-          publico_alvo: string | null
-          responsavel_id: string | null
+          observacoes: string | null
+          projeto_id: string
+          responsavel: string | null
           status: string
-          territorio: string | null
-          titulo: string
         }
         Insert: {
-          cidade?: string | null
           created_at?: string
           data_fim?: string | null
           data_inicio?: string | null
           descricao?: string | null
-          edital_id?: string | null
+          etapa: string
           id?: string
-          indicadores?: string | null
-          metas?: string | null
-          numero_projeto?: string | null
-          objetivo_geral?: string | null
-          objetivos_especificos?: string | null
-          orcamento_previsto?: number | null
-          publico_alvo?: string | null
-          responsavel_id?: string | null
+          observacoes?: string | null
+          projeto_id: string
+          responsavel?: string | null
           status?: string
-          territorio?: string | null
-          titulo: string
         }
         Update: {
-          cidade?: string | null
           created_at?: string
           data_fim?: string | null
           data_inicio?: string | null
           descricao?: string | null
-          edital_id?: string | null
+          etapa?: string
           id?: string
+          observacoes?: string | null
+          projeto_id?: string
+          responsavel?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
+      projeto_documentos: {
+        Row: {
+          created_at: string
+          id: string
+          nome: string
+          observacoes: string | null
+          projeto_id: string
+          responsavel: string | null
+          tipo: string | null
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nome: string
+          observacoes?: string | null
+          projeto_id: string
+          responsavel?: string | null
+          tipo?: string | null
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          projeto_id?: string
+          responsavel?: string | null
+          tipo?: string | null
+          url?: string
+        }
+        Relationships: []
+      }
+      projeto_fotos: {
+        Row: {
+          atividade_id: string | null
+          created_at: string
+          data_foto: string | null
+          id: string
+          legenda: string | null
+          ordem: number | null
+          projeto_id: string
+          tipo: string | null
+          url: string
+        }
+        Insert: {
+          atividade_id?: string | null
+          created_at?: string
+          data_foto?: string | null
+          id?: string
+          legenda?: string | null
+          ordem?: number | null
+          projeto_id: string
+          tipo?: string | null
+          url: string
+        }
+        Update: {
+          atividade_id?: string | null
+          created_at?: string
+          data_foto?: string | null
+          id?: string
+          legenda?: string | null
+          ordem?: number | null
+          projeto_id?: string
+          tipo?: string | null
+          url?: string
+        }
+        Relationships: []
+      }
+      projeto_metas: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          id: string
+          nome: string
+          observacoes: string | null
+          projeto_id: string
+          quantidade_prevista: number | null
+          quantidade_realizada: number | null
+          status: string
+          unidade_medida: string | null
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          nome: string
+          observacoes?: string | null
+          projeto_id: string
+          quantidade_prevista?: number | null
+          quantidade_realizada?: number | null
+          status?: string
+          unidade_medida?: string | null
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          projeto_id?: string
+          quantidade_prevista?: number | null
+          quantidade_realizada?: number | null
+          status?: string
+          unidade_medida?: string | null
+        }
+        Relationships: []
+      }
+      projeto_orcamento: {
+        Row: {
+          categoria: string | null
+          comprovante_url: string | null
+          created_at: string
+          data_despesa: string | null
+          descricao: string | null
+          fornecedor: string | null
+          id: string
+          observacoes: string | null
+          projeto_id: string
+          valor_executado: number | null
+          valor_previsto: number | null
+        }
+        Insert: {
+          categoria?: string | null
+          comprovante_url?: string | null
+          created_at?: string
+          data_despesa?: string | null
+          descricao?: string | null
+          fornecedor?: string | null
+          id?: string
+          observacoes?: string | null
+          projeto_id: string
+          valor_executado?: number | null
+          valor_previsto?: number | null
+        }
+        Update: {
+          categoria?: string | null
+          comprovante_url?: string | null
+          created_at?: string
+          data_despesa?: string | null
+          descricao?: string | null
+          fornecedor?: string | null
+          id?: string
+          observacoes?: string | null
+          projeto_id?: string
+          valor_executado?: number | null
+          valor_previsto?: number | null
+        }
+        Relationships: []
+      }
+      projetos: {
+        Row: {
+          arquivado: boolean | null
+          atendidos_previstos: number | null
+          atendidos_realizados: number | null
+          cidade: string | null
+          contrapartida: number | null
+          coordenador_id: string | null
+          coordenador_nome: string | null
+          created_at: string
+          data_fim: string | null
+          data_inicio: string | null
+          data_limite_prestacao: string | null
+          descricao: string | null
+          edital_id: string | null
+          edital_nome: string | null
+          fonte_recurso: string | null
+          id: string
+          id_externo: string | null
+          impacto_social: string | null
+          indicadores: string | null
+          justificativa: string | null
+          lei_incentivo: boolean | null
+          local_execucao: string | null
+          metas: string | null
+          metodologia: string | null
+          numero_processo: string | null
+          numero_projeto: string | null
+          numero_termo: string | null
+          objetivo_geral: string | null
+          objetivos_especificos: string | null
+          obs_captacao: string | null
+          orcamento_previsto: number | null
+          orgao_edital: string | null
+          parceiro: string | null
+          patrocinador: string | null
+          publico_alvo: string | null
+          qual_lei_incentivo: string | null
+          responsavel_id: string | null
+          responsavel_nome: string | null
+          resultados_esperados: string | null
+          situacao_prestacao_contas: string | null
+          status: string
+          territorio: string | null
+          tipo: string | null
+          titulo: string
+          updated_at: string
+          valor_aprovado: number | null
+          valor_captado: number | null
+          valor_executado: number | null
+          valor_solicitado: number | null
+        }
+        Insert: {
+          arquivado?: boolean | null
+          atendidos_previstos?: number | null
+          atendidos_realizados?: number | null
+          cidade?: string | null
+          contrapartida?: number | null
+          coordenador_id?: string | null
+          coordenador_nome?: string | null
+          created_at?: string
+          data_fim?: string | null
+          data_inicio?: string | null
+          data_limite_prestacao?: string | null
+          descricao?: string | null
+          edital_id?: string | null
+          edital_nome?: string | null
+          fonte_recurso?: string | null
+          id?: string
+          id_externo?: string | null
+          impacto_social?: string | null
           indicadores?: string | null
+          justificativa?: string | null
+          lei_incentivo?: boolean | null
+          local_execucao?: string | null
           metas?: string | null
+          metodologia?: string | null
+          numero_processo?: string | null
           numero_projeto?: string | null
+          numero_termo?: string | null
           objetivo_geral?: string | null
           objetivos_especificos?: string | null
+          obs_captacao?: string | null
           orcamento_previsto?: number | null
+          orgao_edital?: string | null
+          parceiro?: string | null
+          patrocinador?: string | null
           publico_alvo?: string | null
+          qual_lei_incentivo?: string | null
           responsavel_id?: string | null
+          responsavel_nome?: string | null
+          resultados_esperados?: string | null
+          situacao_prestacao_contas?: string | null
           status?: string
           territorio?: string | null
+          tipo?: string | null
+          titulo: string
+          updated_at?: string
+          valor_aprovado?: number | null
+          valor_captado?: number | null
+          valor_executado?: number | null
+          valor_solicitado?: number | null
+        }
+        Update: {
+          arquivado?: boolean | null
+          atendidos_previstos?: number | null
+          atendidos_realizados?: number | null
+          cidade?: string | null
+          contrapartida?: number | null
+          coordenador_id?: string | null
+          coordenador_nome?: string | null
+          created_at?: string
+          data_fim?: string | null
+          data_inicio?: string | null
+          data_limite_prestacao?: string | null
+          descricao?: string | null
+          edital_id?: string | null
+          edital_nome?: string | null
+          fonte_recurso?: string | null
+          id?: string
+          id_externo?: string | null
+          impacto_social?: string | null
+          indicadores?: string | null
+          justificativa?: string | null
+          lei_incentivo?: boolean | null
+          local_execucao?: string | null
+          metas?: string | null
+          metodologia?: string | null
+          numero_processo?: string | null
+          numero_projeto?: string | null
+          numero_termo?: string | null
+          objetivo_geral?: string | null
+          objetivos_especificos?: string | null
+          obs_captacao?: string | null
+          orcamento_previsto?: number | null
+          orgao_edital?: string | null
+          parceiro?: string | null
+          patrocinador?: string | null
+          publico_alvo?: string | null
+          qual_lei_incentivo?: string | null
+          responsavel_id?: string | null
+          responsavel_nome?: string | null
+          resultados_esperados?: string | null
+          situacao_prestacao_contas?: string | null
+          status?: string
+          territorio?: string | null
+          tipo?: string | null
           titulo?: string
+          updated_at?: string
+          valor_aprovado?: number | null
+          valor_captado?: number | null
+          valor_executado?: number | null
+          valor_solicitado?: number | null
         }
         Relationships: [
           {

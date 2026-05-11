@@ -1,62 +1,114 @@
-## Plano: Reformular módulo Atividades
+## Plano: Módulo Projetos completo
 
-Vou expandir o módulo Atividades para incluir calendário de encontros, inscritos com abas, galeria de fotos e edição completa por blocos, mantendo a identidade visual do Circuito Inclusão.
+Vou expandir o módulo **Projetos** seguindo o mesmo padrão do módulo Atendidos: listagem rica, ficha em abas, importação por planilha com detecção automática de cabeçalho, tabelas relacionadas (metas, cronograma, orçamento, documentos, fotos), e relatórios.
 
-### 1. Banco de dados (1 migration)
+### Escopo MVP (primeira entrega)
 
-Ampliar tabela `atividades` adicionando colunas:
-- `quem_pode_participar`, `descricao`, `objetivo_relacionado`, `resultado_esperado`
-- `controle_presenca` (bool), `media_final_conceito` (bool)
-- `formato_execucao` ('curso' | 'atividade_unica')
-- `carga_horaria_horas`, `carga_horaria_minutos`, `numero_vagas`, `permite_ultrapassar_limite`
-- `data_inicio`, `data_fim`, `periodo_matutino`, `periodo_vespertino`, `periodo_noturno`
-- `foto_capa_url`, `foto_capa_legenda`
+Para evitar uma entrega monolítica difícil de revisar, vou dividir em **2 fases**. Esta primeira fase entrega o núcleo funcional; a segunda fase (relatórios, dashboards e prestação de contas avançada) virá depois mediante sua confirmação.
 
-Criar novas tabelas com RLS (mesmas policies dos demais: `view`=true, `ins/upd`=can_edit, `del`=is_admin_or_coord):
-- `atividade_educadores` (atividade_id, usuario_id)
-- `atividade_gestores` (atividade_id, usuario_id)
-- `encontros_atividade` (data, horario_inicio/fim, periodo, status, resumo, numero_presentes, observacoes)
-- `atividade_inscritos` (atendido_id, status: inscrito/espera/removido, data_inscricao, observacoes)
-- `presencas_atividade` (encontro_id, atendido_id, presente, observacao)
-- `atividade_fotos` (atividade_id, encontro_id, tipo_foto, url, legenda, data_foto, ordem)
+### Fase 1 — Núcleo do módulo
 
-### 2. Tela de detalhe `/atividades/$id`
+#### 1. Banco de dados (1 migration)
 
-Reescrever com seções:
-- **Header**: breadcrumb, título "Detalhe de [nome] – Projeto nº [num]", foto de capa com upload
-- **Calendário de aulas**: tabela com data/horário/período/status + botão "Registrar" (modal), criar/excluir encontros, legenda colorida de status
-- **Lista de inscritos**: 3 abas (Inscritos / Em espera / Removidos), busca de atendidos para adicionar, ações detalhes/editar/remover
-- **Galeria**: grid de fotos da atividade + encontros, filtro por mês/encontro, upload múltiplo
-- **Botão "Gerar arquivo"**: dropdown com lista CSV de inscritos e relatório de presença
+Ampliar `projetos` adicionando:
+- `id_externo`, `numero_projeto` (já existe), `tipo`, `local_execucao`
+- `atendidos_previstos`, `atendidos_realizados`
+- `responsavel_nome`, `coordenador_id`, `coordenador_nome`
+- `edital_nome`, `orgao_edital`, `fonte_recurso`, `lei_incentivo` (bool), `qual_lei_incentivo`, `numero_processo`, `numero_termo`, `patrocinador`, `parceiro`
+- `valor_solicitado`, `valor_aprovado` (existe como `orcamento_previsto` — manter ambos), `valor_captado`, `valor_executado`, `contrapartida`, `obs_captacao`
+- `justificativa`, `metodologia`, `resultados_esperados`, `impacto_social`
+- `situacao_prestacao_contas`, `data_limite_prestacao`, `arquivado` (bool)
+- `updated_at` + trigger
 
-### 3. Tela de edição `/atividades/$id/editar`
+Criar tabelas com RLS (mesmas policies dos demais — view=true, ins/upd=can_edit, del=is_admin_or_coord):
+- `projeto_metas` (nome, descricao, qtd_prevista, qtd_realizada, unidade, status, observacoes)
+- `projeto_cronograma` (etapa, descricao, data_inicio, data_fim, responsavel, status, observacoes)
+- `projeto_orcamento` (categoria, descricao, valor_previsto, valor_executado, data_despesa, fornecedor, comprovante_url, observacoes)
+- `projeto_documentos` (nome, tipo, url, responsavel, observacoes)
+- `projeto_fotos` (atividade_id, url, legenda, data_foto, tipo, ordem)
 
-Form em 5 blocos colapsáveis: Dados gerais, Responsáveis, Configurações, Período, Imagens. Botões: Excluir, Cancelar, Salvar.
+Índice único parcial em `id_externo` e `numero_projeto` para upsert.
 
-### 4. Modal "Registrar encontro"
+#### 2. Helpers e constantes
 
-Component reutilizável: status, data/hora/período, resumo, presentes, observações, upload múltiplo de fotos do encontro. Se `controle_presenca` ativo, lista os inscritos com checkbox presente/ausente.
+Novo `src/lib/projetos.ts`:
+- Constantes: `PROJETO_STATUS` (13 status), `META_STATUS`, `CRONOGRAMA_STATUS`, `PRESTACAO_STATUS`, `CATEGORIAS_ORCAMENTO`, `TIPOS_DOCUMENTO`
+- Helpers: `statusLabel`, `statusClass`, `formatCurrency`
 
-### 5. Mobile
+#### 3. Listagem `/projetos`
 
-Tabelas viram cards no <md, botões grandes, input file com `capture="environment"` para abrir câmera.
+Reescrever com:
+- Breadcrumb, busca livre, botões: Novo projeto, Importar planilha, Gerar arquivo (CSV), Filtros
+- Tabela: Nome, Nº, Status, Edital, Cidade, Responsável, Início, Fim, Valor aprovado, Valor executado, Atividades (count), Atendidos (count), Prestação de contas, Ações
+- Mobile: cards
+- Filtros: status, cidade, edital, responsável, período, prestação de contas, "sem atividade"
+- Ações por linha: Detalhes, Editar, Duplicar, Arquivar, Excluir (com confirm)
 
-### 6. Arquivos a criar/editar
+#### 4. Cadastro/Edição `/projetos/novo` e `/projetos/$id/editar`
 
-Novos:
-- `supabase/migrations/<timestamp>_atividades_modulo_completo.sql`
-- `src/lib/atividades.ts` (helpers de CRUD)
-- `src/components/atividades/CapaUpload.tsx`
-- `src/components/atividades/CalendarioEncontros.tsx`
-- `src/components/atividades/RegistrarEncontroDialog.tsx`
-- `src/components/atividades/ListaInscritos.tsx`
-- `src/components/atividades/GaleriaAtividade.tsx`
-- `src/components/atividades/AtividadeForm.tsx`
+Form único reutilizável `ProjetoForm.tsx` com **5 blocos colapsáveis**:
+1. Dados principais
+2. Edital / Fonte de recurso
+3. Objetivos e metodologia
+4. Captação financeira (valores)
+5. Prestação de contas
 
-Editados:
-- `src/routes/_app/atividades/$id/index.tsx` (detalhe completo)
-- `src/routes/_app/atividades/$id/editar.tsx` (form em blocos)
-- `src/routes/_app/atividades/novo.tsx` (usar AtividadeForm)
-- `src/routes/_app/atividades/index.tsx` (manter listagem, ajustar colunas)
+Apenas **nome** é obrigatório.
 
-Identidade visual mantida: azul primário, lilás/amarelo/cinza de apoio, fundo claro, tabelas limpas, responsivo. Tudo em pt-BR.
+#### 5. Ficha `/projetos/$id`
+
+Cabeçalho com nome, nº, status, cidade, responsável, período, valor aprovado + botões (Editar, Nova atividade, Adicionar atendido, Gerar arquivo, Arquivar).
+
+Cards de resumo: Total atendidos, Total atividades, Encontros realizados, Frequência média, Valor aprovado, Valor executado, Saldo, Metas cumpridas.
+
+**Abas (Tabs):**
+- Visão geral
+- Atividades (lista filtrada por `projeto_id`)
+- Atendidos (de `atendido_projetos`)
+- Metas (CRUD inline)
+- Cronograma (CRUD inline)
+- Orçamento (CRUD inline + resumo)
+- Documentos (upload para bucket `documentos`)
+- Fotos (galeria + upload)
+- Prestação de contas
+
+Botão "Gerar arquivo": dropdown com CSV de atendidos, CSV financeiro, página imprimível.
+
+#### 6. Importação `ImportarProjetosDialog.tsx`
+
+Reaproveitando a lógica do dialog de Atendidos:
+- XLS/XLSX/CSV/TSV via SheetJS
+- Detecção automática da linha de cabeçalho (ignora "Projetos", "Dados do projeto" etc.)
+- ALIAS map para todas as variações listadas
+- Upsert por `id_externo` ou `numero_projeto`
+- Prévia com 10 linhas, contadores (linhas, válidos, com ID, sem nome)
+- Botão "Baixar modelo" gera XLSX com colunas exemplares
+
+### Fase 2 (depois, mediante confirmação)
+
+- Submenus: Propostas, Em execução, Finalizados, Prestação de contas (filtros pré-aplicados)
+- Tela "Dados incompletos dos projetos"
+- Relatórios com gráficos (barras, pizza, linha do tempo)
+- `projeto_relatorios` armazenando relatórios gerados
+
+### Arquivos novos
+- `supabase/migrations/<ts>_projetos_modulo_completo.sql`
+- `src/lib/projetos.ts`
+- `src/components/projetos/ProjetoForm.tsx`
+- `src/components/projetos/ImportarProjetosDialog.tsx`
+- `src/components/projetos/MetasTab.tsx`
+- `src/components/projetos/CronogramaTab.tsx`
+- `src/components/projetos/OrcamentoTab.tsx`
+- `src/components/projetos/DocumentosTab.tsx`
+- `src/components/projetos/FotosTab.tsx`
+
+### Arquivos editados
+- `src/routes/_app/projetos/index.tsx`
+- `src/routes/_app/projetos/novo.tsx`
+- `src/routes/_app/projetos/$id/editar.tsx`
+- `src/routes/_app/projetos/$id/index.tsx`
+- `src/components/AppLayout.tsx` (adicionar item "Importar planilha" no submenu de Projetos, se aplicável)
+
+Identidade visual mantida: azul primário, lilás/amarelo de apoio, fundo claro, tabelas limpas, responsivo, pt-BR.
+
+Confirma esse plano para Fase 1? Posso iniciar a migration e construção em seguida.
