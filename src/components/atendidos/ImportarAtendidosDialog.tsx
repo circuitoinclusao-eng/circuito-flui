@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Upload, Download } from "lucide-react";
@@ -14,6 +15,7 @@ const CAMPOS_DESTINO = [
   { value: "id_externo", label: "ID externo / código origem" },
   { value: "matricula_familia", label: "Matrícula família" },
   { value: "data_nascimento", label: "Data de nascimento" },
+  { value: "idade_importada", label: "Idade importada" },
   { value: "cpf", label: "CPF" },
   { value: "rg", label: "RG" },
   { value: "telefone", label: "Telefone" },
@@ -35,39 +37,41 @@ const CAMPOS_DESTINO = [
 ];
 
 const ALIAS: Record<string, string> = {
-  nome: "nome", nome_completo: "nome", "nome completo": "nome", participante: "nome",
-  nome_civil: "nome", "nome civil": "nome", nome_social: "nome", "nome social": "nome",
-  id_atendido: "id_externo", id: "id_externo", codigo: "id_externo", "código": "id_externo", codigo_origem: "id_externo", "código origem": "id_externo", id_externo: "id_externo",
-  matricula: "matricula_familia", matricula_familia: "matricula_familia", "matrícula": "matricula_familia", "matrícula família": "matricula_familia", "matrícula familia": "matricula_familia",
-  idade: "__ignore__",
-  data_nascimento: "data_nascimento", "data de nascimento": "data_nascimento", nascimento: "data_nascimento", dt_nascimento: "data_nascimento",
+  nome: "nome", nome_completo: "nome", participante: "nome",
+  nome_civil: "nome", nome_social: "nome",
+  id_atendido: "id_externo", id: "id_externo", codigo: "id_externo", codigo_origem: "id_externo", id_externo: "id_externo",
+  matricula: "matricula_familia", matricula_familia: "matricula_familia", matricula_da_familia: "matricula_familia",
+  idade: "idade_importada", idade_importada: "idade_importada",
+  data_nascimento: "data_nascimento", data_de_nascimento: "data_nascimento", nascimento: "data_nascimento", dt_nascimento: "data_nascimento",
   cpf: "cpf", rg: "rg",
   telefone: "telefone", celular: "telefone", fone: "telefone",
   whatsapp: "whatsapp", zap: "whatsapp",
-  email: "email", "e-mail": "email",
-  cidade: "cidade", municipio: "cidade", "município": "cidade",
-  bairro: "bairro", endereco: "endereco", "endereço": "endereco", logradouro: "endereco", cep: "cep",
-  genero: "genero", "gênero": "genero", sexo: "genero",
+  email: "email", "e_mail": "email",
+  cidade: "cidade", municipio: "cidade",
+  bairro: "bairro", endereco: "endereco", logradouro: "endereco", cep: "cep",
+  genero: "genero", sexo: "genero",
   escolaridade: "escolaridade",
-  pessoa_com_deficiencia: "pessoa_com_deficiencia", pcd: "pessoa_com_deficiencia", "pessoa com deficiência": "pessoa_com_deficiencia",
-  tipo_deficiencia: "tipo_deficiencia", "tipo de deficiência": "tipo_deficiencia", deficiencia: "tipo_deficiencia",
-  responsavel: "responsavel_nome", nome_responsavel: "responsavel_nome", "nome do responsável": "responsavel_nome", responsavel_nome: "responsavel_nome",
-  telefone_responsavel: "responsavel_telefone", "telefone do responsável": "responsavel_telefone",
+  pessoa_com_deficiencia: "pessoa_com_deficiencia", pcd: "pessoa_com_deficiencia",
+  tipo_deficiencia: "tipo_deficiencia", deficiencia: "tipo_deficiencia",
+  responsavel: "responsavel_nome", nome_responsavel: "responsavel_nome", nome_do_responsavel: "responsavel_nome", responsavel_nome: "responsavel_nome",
+  telefone_responsavel: "responsavel_telefone", telefone_do_responsavel: "responsavel_telefone",
   parentesco: "responsavel_parentesco", responsavel_parentesco: "responsavel_parentesco",
-  status: "status", situacao: "status", "situação": "status", status_atendimento: "status",
-  observacoes: "observacoes", "observações": "observacoes", obs: "observacoes",
+  status: "status", situacao: "status", status_atendimento: "status",
+  observacoes: "observacoes", obs: "observacoes",
 };
 
 function norm(s: string) {
-  return s.toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  return String(s ?? "").toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "_").replace(/[^\w]/g, "_").replace(/_+/g, "_").replace(/^_|_$/g, "");
 }
 
 function detectDelimiter(sample: string): string {
   const candidates = [";", ",", "\t", "|"];
   let best = ",", max = 0;
+  const firstLines = sample.split("\n").slice(0, 5);
   for (const c of candidates) {
-    const count = (sample.split("\n")[0]?.split(c).length ?? 1) - 1;
-    if (count > max) { max = count; best = c; }
+    const counts = firstLines.map((l) => l.split(c).length - 1);
+    const score = Math.max(...counts);
+    if (score > max) { max = score; best = c; }
   }
   return best;
 }
@@ -90,7 +94,28 @@ function parseCSV(text: string, delim: string): string[][] {
     }
   }
   if (field.length || cur.length) { cur.push(field); rows.push(cur); }
-  return rows.filter((r) => r.some((c) => c.trim() !== ""));
+  return rows.filter((r) => r.some((c) => String(c).trim() !== ""));
+}
+
+// Detect which row is the real header: scoring rows by how many cells map to known aliases
+function detectHeaderRow(allRows: any[][]): number {
+  const maxScan = Math.min(allRows.length, 10);
+  let bestIdx = 0, bestScore = -1;
+  for (let i = 0; i < maxScan; i++) {
+    const row = allRows[i];
+    const nonEmpty = row.filter((c) => String(c ?? "").trim() !== "").length;
+    if (nonEmpty < 2) continue; // skip title rows like "Dados pessoais"
+    let score = 0;
+    for (const c of row) {
+      const k = norm(c);
+      if (!k) continue;
+      if (ALIAS[k]) score += 2;
+      // also reward cells that look like field names (short, all text, no digits)
+      else if (k.length > 1 && k.length < 40 && !/^\d+$/.test(k)) score += 0.2;
+    }
+    if (score > bestScore) { bestScore = score; bestIdx = i; }
+  }
+  return bestIdx;
 }
 
 function excelDateToISO(v: any): string | null {
@@ -127,31 +152,41 @@ function normalizeStatus(v: any): string | null {
   if (!v) return null;
   const s = norm(String(v));
   const map: Record<string, string> = {
-    ativo: "ativo", "em acompanhamento": "em_acompanhamento", em_acompanhamento: "em_acompanhamento",
-    "aguardando retorno": "aguardando_retorno", encaminhado: "encaminhado",
+    ativo: "ativo", em_acompanhamento: "em_acompanhamento",
+    aguardando_retorno: "aguardando_retorno", encaminhado: "encaminhado",
     inativo: "inativo", finalizado: "finalizado",
   };
   return map[s] ?? "ativo";
 }
 
+function normalizeGenero(v: any): string | null {
+  if (!v) return null;
+  const s = norm(String(v));
+  if (["m", "masc", "masculino", "homem"].includes(s)) return "Masculino";
+  if (["f", "fem", "feminino", "mulher"].includes(s)) return "Feminino";
+  return String(v).trim();
+}
+
 interface Props { open: boolean; onClose: () => void; onDone: () => void; }
 
 export function ImportarAtendidosDialog({ open, onClose, onDone }: Props) {
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [step, setStep] = useState<1 | 2>(1);
   const [fileName, setFileName] = useState("");
   const [sheets, setSheets] = useState<string[]>([]);
   const [workbook, setWorkbook] = useState<XLSX.WorkBook | null>(null);
   const [rawCsvText, setRawCsvText] = useState<string | null>(null);
   const [delim, setDelim] = useState<string>(";");
   const [sheetName, setSheetName] = useState<string>("");
+  const [allRows, setAllRows] = useState<any[][]>([]);
+  const [headerRowIdx, setHeaderRowIdx] = useState<number>(0);
   const [headers, setHeaders] = useState<string[]>([]);
-  const [rows, setRows] = useState<string[][]>([]);
+  const [rows, setRows] = useState<any[][]>([]);
   const [mapping, setMapping] = useState<Record<number, string>>({});
   const [busy, setBusy] = useState(false);
 
   function reset() {
     setStep(1); setFileName(""); setSheets([]); setWorkbook(null); setRawCsvText(null);
-    setSheetName(""); setHeaders([]); setRows([]); setMapping({});
+    setSheetName(""); setAllRows([]); setHeaderRowIdx(0); setHeaders([]); setRows([]); setMapping({});
   }
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -159,7 +194,7 @@ export function ImportarAtendidosDialog({ open, onClose, onDone }: Props) {
     setFileName(f.name);
     const ext = f.name.toLowerCase().split(".").pop();
     try {
-      if (ext === "csv" || ext === "txt") {
+      if (ext === "csv" || ext === "txt" || ext === "tsv") {
         const text = await f.text();
         setRawCsvText(text);
         const d = detectDelimiter(text);
@@ -181,13 +216,20 @@ export function ImportarAtendidosDialog({ open, onClose, onDone }: Props) {
     e.target.value = "";
   }
 
+  function applyHeaderRow(all: any[][], idx: number) {
+    const h = (all[idx] ?? []).map((x) => String(x ?? "").trim());
+    const rest = all.slice(idx + 1);
+    setHeaders(h);
+    setRows(rest);
+    autoMap(h);
+  }
+
   function loadCsv(text: string, d: string) {
     const all = parseCSV(text, d);
     if (!all.length) { toast.error("Arquivo vazio."); return; }
-    const [h, ...rest] = all;
-    setHeaders(h.map((x) => x.trim()));
-    setRows(rest);
-    autoMap(h);
+    const idx = detectHeaderRow(all);
+    setAllRows(all); setHeaderRowIdx(idx);
+    applyHeaderRow(all, idx);
   }
 
   function loadSheet(wb: XLSX.WorkBook, sn: string) {
@@ -195,18 +237,16 @@ export function ImportarAtendidosDialog({ open, onClose, onDone }: Props) {
     const aoa = XLSX.utils.sheet_to_json<any[]>(ws, { header: 1, defval: "", raw: true });
     const filtered = aoa.filter((r) => r.some((c) => String(c ?? "").trim() !== ""));
     if (!filtered.length) { toast.error("Aba vazia."); return; }
-    const [h, ...rest] = filtered;
-    setHeaders(h.map((x) => String(x ?? "").trim()));
-    setRows(rest.map((r) => r.map((c) => (c instanceof Date ? c.toISOString().slice(0, 10) : c))));
-    autoMap(h.map((x) => String(x ?? "")));
+    const idx = detectHeaderRow(filtered);
+    setAllRows(filtered); setHeaderRowIdx(idx);
+    applyHeaderRow(filtered, idx);
   }
 
   function autoMap(h: string[]) {
     const m: Record<number, string> = {};
     h.forEach((col, i) => {
-      const key = norm(col).replace(/\s+/g, "_");
-      const direct = ALIAS[key] ?? ALIAS[norm(col)];
-      m[i] = direct ?? "__ignore__";
+      const key = norm(col);
+      m[i] = ALIAS[key] ?? "__ignore__";
     });
     setMapping(m);
   }
@@ -221,47 +261,84 @@ export function ImportarAtendidosDialog({ open, onClose, onDone }: Props) {
     if (workbook) loadSheet(workbook, sn);
   }
 
+  function changeHeaderRow(idx: number) {
+    setHeaderRowIdx(idx);
+    applyHeaderRow(allRows, idx);
+  }
+
+  function buildRecord(r: any[]): any | null {
+    const o: any = {};
+    headers.forEach((_, i) => {
+      const dest = mapping[i];
+      if (!dest || dest === "__ignore__") return;
+      const raw = r[i];
+      if (raw == null || String(raw).trim() === "") return;
+      let val: any = String(raw).trim();
+      if (dest === "data_nascimento") val = excelDateToISO(raw);
+      else if (dest === "idade_importada") { const n = parseInt(String(raw).replace(/\D/g, ""), 10); val = isNaN(n) ? null : n; }
+      else if (dest === "pessoa_com_deficiencia") val = normalizePcd(val);
+      else if (dest === "status") val = normalizeStatus(val);
+      else if (dest === "genero") val = normalizeGenero(val);
+      else if (dest === "cpf") val = String(val).replace(/\D/g, "") || null;
+      if (val != null && val !== "") o[dest] = val;
+    });
+    if (!o.nome) return null;
+    if (!o.status) o.status = "ativo";
+    return o;
+  }
+
   async function importar() {
     setBusy(true);
-    const objs: any[] = [];
-    let pulados = 0;
+    const valid: any[] = [];
+    let semNome = 0;
     for (const r of rows) {
-      const o: any = {};
-      headers.forEach((_, i) => {
-        const dest = mapping[i];
-        if (!dest || dest === "__ignore__") return;
-        let val: any = r[i];
-        if (val == null || String(val).trim() === "") return;
-        val = String(val).trim();
-        if (dest === "data_nascimento") val = excelDateToISO(r[i]);
-        else if (dest === "pessoa_com_deficiencia") val = normalizePcd(val);
-        else if (dest === "status") val = normalizeStatus(val);
-        else if (dest === "cpf") val = String(val).replace(/\D/g, "") || null;
-        if (val != null) o[dest] = val;
-      });
-      if (!o.nome) { pulados++; continue; }
-      if (!o.status) o.status = "ativo";
-      objs.push(o);
+      const o = buildRecord(r);
+      if (!o) { semNome++; continue; }
+      valid.push(o);
     }
-    if (!objs.length) { setBusy(false); toast.error("Nenhum registro válido. Verifique o mapeamento (campo Nome é obrigatório)."); return; }
-    const { error, count } = await supabase.from("atendidos").insert(objs, { count: "exact" });
+    if (!valid.length) { setBusy(false); toast.error("Nenhum registro válido. Verifique o mapeamento (campo Nome é obrigatório)."); return; }
+
+    // Split: with id_externo (upsert) vs without (insert)
+    const comId = valid.filter((o) => o.id_externo);
+    const semId = valid.filter((o) => !o.id_externo);
+
+    let novos = 0, atualizados = 0, erros = 0;
+
+    if (comId.length) {
+      const { data, error } = await supabase.from("atendidos").upsert(comId, { onConflict: "id_externo", ignoreDuplicates: false }).select("id");
+      if (error) { erros += comId.length; toast.error(`Erro upsert: ${error.message}`); }
+      else { atualizados += data?.length ?? 0; }
+    }
+    if (semId.length) {
+      const { data, error } = await supabase.from("atendidos").insert(semId).select("id");
+      if (error) { erros += semId.length; toast.error(`Erro insert: ${error.message}`); }
+      else { novos += data?.length ?? 0; }
+    }
+
     setBusy(false);
-    if (error) { toast.error(`Erro: ${error.message}`); return; }
-    toast.success(`${count ?? objs.length} atendidos importados${pulados ? ` (${pulados} ignorados sem nome)` : ""}.`);
+    const msgs = [`${novos + atualizados} atendido(s) processado(s)`];
+    if (semNome) msgs.push(`${semNome} sem nome ignorado(s)`);
+    if (erros) msgs.push(`${erros} com erro`);
+    toast.success(`Importação concluída. ${msgs.join(" • ")}.`);
     onDone(); reset(); onClose();
   }
 
   function baixarModelo() {
-    const headers = ["nome_completo", "data_nascimento", "cpf", "telefone", "whatsapp", "cidade", "bairro", "nome_responsavel", "telefone_responsavel", "genero", "escolaridade", "pessoa_com_deficiencia", "tipo_deficiencia", "status", "observacoes"];
-    const ws = XLSX.utils.aoa_to_sheet([headers, ["João da Silva", "2010-05-12", "", "(11) 99999-0000", "", "São Paulo", "Centro", "Maria da Silva", "(11) 98888-0000", "masculino", "fundamental", "sim", "TEA", "ativo", ""]]);
+    const headers = ["ID_Atendido", "Nome civil", "Matrícula", "Gênero", "Data de nascimento", "Idade", "CPF", "Telefone", "WhatsApp", "Cidade", "Bairro", "Nome do responsável", "Telefone do responsável", "Status", "Observações"];
+    const ws = XLSX.utils.aoa_to_sheet([headers, ["12345", "João da Silva", "F250001230", "Masculino", "16/11/1977", "48", "", "(11) 99999-0000", "", "São Paulo", "Centro", "Maria da Silva", "(11) 98888-0000", "ativo", ""]]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Atendidos");
     XLSX.writeFile(wb, "modelo-atendidos.xlsx");
   }
 
+  const totalLinhas = rows.length;
+  const validos = rows.filter((r) => buildRecord(r)).length;
+  const semNomeCount = totalLinhas - validos;
+  const comIdCount = rows.filter((r) => { const o = buildRecord(r); return o && o.id_externo; }).length;
+
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) { reset(); onClose(); } }}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Importar atendidos</DialogTitle>
         </DialogHeader>
@@ -270,7 +347,7 @@ export function ImportarAtendidosDialog({ open, onClose, onDone }: Props) {
           <div className="space-y-4 py-4">
             <p className="text-sm text-muted-foreground">
               Envie sua planilha em formato <b>.xls</b>, <b>.xlsx</b> ou <b>.csv</b>. O sistema fará a leitura,
-              mostrará uma prévia e permitirá revisar as informações antes de importar.
+              detectará automaticamente o cabeçalho e permitirá revisar antes de importar.
             </p>
             <div className="flex flex-wrap gap-3">
               <label className="inline-flex items-center px-4 h-10 bg-primary text-primary-foreground rounded-md cursor-pointer hover:opacity-90">
@@ -287,7 +364,7 @@ export function ImportarAtendidosDialog({ open, onClose, onDone }: Props) {
         {step === 2 && (
           <div className="space-y-4">
             <div className="text-sm">Arquivo: <b>{fileName}</b></div>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3 items-end">
               {sheets.length > 1 && (
                 <div>
                   <Label className="text-xs">Aba</Label>
@@ -311,6 +388,21 @@ export function ImportarAtendidosDialog({ open, onClose, onDone }: Props) {
                   </Select>
                 </div>
               )}
+              <div>
+                <Label className="text-xs">Linha do cabeçalho</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={Math.min(allRows.length, 20)}
+                  value={headerRowIdx + 1}
+                  onChange={(e) => {
+                    const n = Math.max(1, Math.min(allRows.length, parseInt(e.target.value || "1", 10)));
+                    changeHeaderRow(n - 1);
+                  }}
+                  className="w-32"
+                />
+                <p className="text-[11px] text-muted-foreground mt-1">Detectada automaticamente. Ajuste se necessário.</p>
+              </div>
             </div>
 
             <div>
@@ -341,13 +433,20 @@ export function ImportarAtendidosDialog({ open, onClose, onDone }: Props) {
               )}
             </div>
 
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+              <Stat label="Linhas" v={totalLinhas} />
+              <Stat label="Válidos" v={validos} />
+              <Stat label="Com ID externo (atualiza)" v={comIdCount} />
+              <Stat label="Sem nome (ignorados)" v={semNomeCount} />
+            </div>
+
             <div>
-              <h3 className="font-medium text-sm mb-2">Prévia (primeiras 5 linhas de {rows.length})</h3>
+              <h3 className="font-medium text-sm mb-2">Prévia (primeiras 10 linhas de {totalLinhas})</h3>
               <div className="border rounded-lg overflow-x-auto">
                 <table className="w-full text-xs">
                   <thead className="bg-muted/50"><tr>{headers.map((h, i) => <th key={i} className="p-2 text-left">{h}</th>)}</tr></thead>
                   <tbody>
-                    {rows.slice(0, 5).map((r, ri) => (
+                    {rows.slice(0, 10).map((r, ri) => (
                       <tr key={ri} className="border-t">{headers.map((_, i) => <td key={i} className="p-2 truncate max-w-xs">{String(r[i] ?? "")}</td>)}</tr>
                     ))}
                   </tbody>
@@ -362,12 +461,21 @@ export function ImportarAtendidosDialog({ open, onClose, onDone }: Props) {
             <>
               <Button variant="ghost" onClick={() => { reset(); }}>Cancelar</Button>
               <Button disabled={busy || !Object.values(mapping).includes("nome")} onClick={importar}>
-                {busy ? "Importando..." : `Importar ${rows.length} registros`}
+                {busy ? "Importando..." : `Importar ${validos} registros`}
               </Button>
             </>
           )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function Stat({ label, v }: { label: string; v: number }) {
+  return (
+    <div className="bg-muted/40 rounded-lg p-3">
+      <div className="text-[11px] uppercase text-muted-foreground">{label}</div>
+      <div className="text-lg font-semibold">{v}</div>
+    </div>
   );
 }
