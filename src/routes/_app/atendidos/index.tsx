@@ -46,6 +46,7 @@ function ListaAtendidos() {
   const [cols, setCols] = useState<string[]>(["foto", "nome", "status", "matricula_familia", "idade", "cpf", "telefone", "cidade", "projeto"]);
   const [projetos, setProjetos] = useState<any[]>([]);
   const [grupos, setGrupos] = useState<any[]>([]);
+  const [importOpen, setImportOpen] = useState(false);
 
   async function load() {
     const { data } = await supabase.from("atendidos").select("*").order("nome");
