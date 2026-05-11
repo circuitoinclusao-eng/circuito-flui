@@ -10,6 +10,11 @@ export const FORMATO_EXECUCAO = [
   { value: "atividade_unica", label: "Atividade única" },
 ] as const;
 
+export const MODALIDADES = [
+  "Skate", "Futebol", "Atletismo", "Judô", "Capoeira", "Dança",
+  "Power Soccer", "Caminhada", "Corrida", "Ciclismo", "Teatro", "Oficina", "Outros",
+] as const;
+
 export const PERIODOS = [
   { value: "matutino", label: "Matutino" },
   { value: "vespertino", label: "Vespertino" },

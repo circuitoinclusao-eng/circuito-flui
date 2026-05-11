@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/lib/auth";
+import { useAuth, ROLE_LABELS } from "@/lib/auth";
 import { PageHeader } from "@/components/AppLayout";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
@@ -10,7 +10,7 @@ export const Route = createFileRoute("/_app/configuracoes/")({
   component: Config,
 });
 
-const ROLES = ["administrador", "coordenador", "colaborador", "consulta"] as const;
+const ROLES = ["administrador", "coordenador", "professor", "colaborador", "consulta"] as const;
 
 function Config() {
   const { hasRole, profile } = useAuth();
@@ -63,7 +63,7 @@ function Config() {
                         <Select value={cur?.role ?? ""} onValueChange={(v) => changeRole(u.id, cur?.id, v)}>
                           <SelectTrigger className="w-44"><SelectValue placeholder="—" /></SelectTrigger>
                           <SelectContent>
-                            {ROLES.map((r) => <SelectItem key={r} value={r} className="capitalize">{r}</SelectItem>)}
+                            {ROLES.map((r) => <SelectItem key={r} value={r}>{ROLE_LABELS[r]}</SelectItem>)}
                           </SelectContent>
                         </Select>
                       </td>

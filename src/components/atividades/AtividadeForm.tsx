@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
-import { FORMATO_EXECUCAO } from "@/lib/atividades";
+import { FORMATO_EXECUCAO, MODALIDADES } from "@/lib/atividades";
 import { CapaUpload } from "./CapaUpload";
 import { toast } from "sonner";
 
@@ -96,8 +96,24 @@ export function AtividadeForm({ id, initial }: Props) {
             </Select>
           </div>
           <div>
-            <Label>Tipo</Label>
-            <Input value={v.tipo ?? ""} onChange={(e) => set("tipo", e.target.value)} placeholder="Ex.: Esporte, Cultura..." />
+            <Label>Modalidade</Label>
+            <Select
+              value={MODALIDADES.includes(v.tipo) ? v.tipo : (v.tipo ? "Outros" : "")}
+              onValueChange={(val) => set("tipo", val === "Outros" ? (MODALIDADES.includes(v.tipo) ? "" : (v.tipo ?? "")) : val)}
+            >
+              <SelectTrigger><SelectValue placeholder="Selecione a modalidade..." /></SelectTrigger>
+              <SelectContent>
+                {MODALIDADES.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            {(v.tipo === "" || (v.tipo && !MODALIDADES.includes(v.tipo))) && (
+              <Input
+                className="mt-2"
+                placeholder="Especifique a modalidade"
+                value={MODALIDADES.includes(v.tipo) ? "" : (v.tipo ?? "")}
+                onChange={(e) => set("tipo", e.target.value)}
+              />
+            )}
           </div>
           <div className="md:col-span-2">
             <Label>Quem pode participar?</Label>
