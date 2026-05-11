@@ -55,10 +55,12 @@ function DetalheAtendido() {
           : <div className="w-24 h-24 rounded-full bg-primary/10 text-primary flex items-center justify-center text-3xl font-bold"><Camera className="w-8 h-8" /></div>}
         <div className="flex-1 min-w-0">
           <h1 className="text-2xl md:text-3xl font-semibold">{r.nome}</h1>
-          <div className="text-sm text-muted-foreground mt-1">
-            Matrícula: <span className="font-mono">{r.matricula}</span>
-            {idade != null && ` • ${idade} anos`}
-            {r.cidade && ` • ${r.cidade}`}
+          <div className="text-sm text-muted-foreground mt-1 flex flex-wrap gap-x-3 gap-y-1">
+            <span>Matrícula: <span className="font-mono">{r.matricula_familia || r.matricula}</span></span>
+            {r.id_externo && <span>ID origem: <span className="font-mono">{r.id_externo}</span></span>}
+            {r.genero && <span>{r.genero}</span>}
+            {idade != null ? <span>{idade} anos</span> : r.idade_importada != null && <span>{r.idade_importada} anos</span>}
+            {r.cidade && <span>{r.cidade}</span>}
           </div>
           <div className="mt-2 flex flex-wrap gap-2">
             <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${statusClass(r.status)}`}>{statusLabel(r.status)}</span>
