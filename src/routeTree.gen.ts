@@ -21,24 +21,28 @@ import { Route as AppContatosIndexRouteImport } from './routes/_app/contatos/ind
 import { Route as AppConfiguracoesIndexRouteImport } from './routes/_app/configuracoes/index'
 import { Route as AppAtividadesIndexRouteImport } from './routes/_app/atividades/index'
 import { Route as AppAtendimentosIndexRouteImport } from './routes/_app/atendimentos/index'
+import { Route as AppAtendidosIndexRouteImport } from './routes/_app/atendidos/index'
 import { Route as AppProjetosNovoRouteImport } from './routes/_app/projetos/novo'
 import { Route as AppGruposNovoRouteImport } from './routes/_app/grupos/novo'
 import { Route as AppEditaisNovoRouteImport } from './routes/_app/editais/novo'
 import { Route as AppContatosNovoRouteImport } from './routes/_app/contatos/novo'
 import { Route as AppAtividadesNovoRouteImport } from './routes/_app/atividades/novo'
 import { Route as AppAtendimentosNovoRouteImport } from './routes/_app/atendimentos/novo'
+import { Route as AppAtendidosNovoRouteImport } from './routes/_app/atendidos/novo'
 import { Route as AppProjetosIdIndexRouteImport } from './routes/_app/projetos/$id/index'
 import { Route as AppGruposIdIndexRouteImport } from './routes/_app/grupos/$id/index'
 import { Route as AppEditaisIdIndexRouteImport } from './routes/_app/editais/$id/index'
 import { Route as AppContatosIdIndexRouteImport } from './routes/_app/contatos/$id/index'
 import { Route as AppAtividadesIdIndexRouteImport } from './routes/_app/atividades/$id/index'
 import { Route as AppAtendimentosIdIndexRouteImport } from './routes/_app/atendimentos/$id/index'
+import { Route as AppAtendidosIdIndexRouteImport } from './routes/_app/atendidos/$id/index'
 import { Route as AppProjetosIdEditarRouteImport } from './routes/_app/projetos/$id/editar'
 import { Route as AppGruposIdEditarRouteImport } from './routes/_app/grupos/$id/editar'
 import { Route as AppEditaisIdEditarRouteImport } from './routes/_app/editais/$id/editar'
 import { Route as AppContatosIdEditarRouteImport } from './routes/_app/contatos/$id/editar'
 import { Route as AppAtividadesIdEditarRouteImport } from './routes/_app/atividades/$id/editar'
 import { Route as AppAtendimentosIdEditarRouteImport } from './routes/_app/atendimentos/$id/editar'
+import { Route as AppAtendidosIdEditarRouteImport } from './routes/_app/atendidos/$id/editar'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -99,6 +103,11 @@ const AppAtendimentosIndexRoute = AppAtendimentosIndexRouteImport.update({
   path: '/atendimentos/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAtendidosIndexRoute = AppAtendidosIndexRouteImport.update({
+  id: '/atendidos/',
+  path: '/atendidos/',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppProjetosNovoRoute = AppProjetosNovoRouteImport.update({
   id: '/projetos/novo',
   path: '/projetos/novo',
@@ -127,6 +136,11 @@ const AppAtividadesNovoRoute = AppAtividadesNovoRouteImport.update({
 const AppAtendimentosNovoRoute = AppAtendimentosNovoRouteImport.update({
   id: '/atendimentos/novo',
   path: '/atendimentos/novo',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAtendidosNovoRoute = AppAtendidosNovoRouteImport.update({
+  id: '/atendidos/novo',
+  path: '/atendidos/novo',
   getParentRoute: () => AppRoute,
 } as any)
 const AppProjetosIdIndexRoute = AppProjetosIdIndexRouteImport.update({
@@ -159,6 +173,11 @@ const AppAtendimentosIdIndexRoute = AppAtendimentosIdIndexRouteImport.update({
   path: '/atendimentos/$id/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAtendidosIdIndexRoute = AppAtendidosIdIndexRouteImport.update({
+  id: '/atendidos/$id/',
+  path: '/atendidos/$id/',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppProjetosIdEditarRoute = AppProjetosIdEditarRouteImport.update({
   id: '/projetos/$id/editar',
   path: '/projetos/$id/editar',
@@ -189,17 +208,24 @@ const AppAtendimentosIdEditarRoute = AppAtendimentosIdEditarRouteImport.update({
   path: '/atendimentos/$id/editar',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAtendidosIdEditarRoute = AppAtendidosIdEditarRouteImport.update({
+  id: '/atendidos/$id/editar',
+  path: '/atendidos/$id/editar',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/inicio': typeof AppInicioRoute
+  '/atendidos/novo': typeof AppAtendidosNovoRoute
   '/atendimentos/novo': typeof AppAtendimentosNovoRoute
   '/atividades/novo': typeof AppAtividadesNovoRoute
   '/contatos/novo': typeof AppContatosNovoRoute
   '/editais/novo': typeof AppEditaisNovoRoute
   '/grupos/novo': typeof AppGruposNovoRoute
   '/projetos/novo': typeof AppProjetosNovoRoute
+  '/atendidos/': typeof AppAtendidosIndexRoute
   '/atendimentos/': typeof AppAtendimentosIndexRoute
   '/atividades/': typeof AppAtividadesIndexRoute
   '/configuracoes/': typeof AppConfiguracoesIndexRoute
@@ -208,12 +234,14 @@ export interface FileRoutesByFullPath {
   '/grupos/': typeof AppGruposIndexRoute
   '/projetos/': typeof AppProjetosIndexRoute
   '/relatorios/': typeof AppRelatoriosIndexRoute
+  '/atendidos/$id/editar': typeof AppAtendidosIdEditarRoute
   '/atendimentos/$id/editar': typeof AppAtendimentosIdEditarRoute
   '/atividades/$id/editar': typeof AppAtividadesIdEditarRoute
   '/contatos/$id/editar': typeof AppContatosIdEditarRoute
   '/editais/$id/editar': typeof AppEditaisIdEditarRoute
   '/grupos/$id/editar': typeof AppGruposIdEditarRoute
   '/projetos/$id/editar': typeof AppProjetosIdEditarRoute
+  '/atendidos/$id/': typeof AppAtendidosIdIndexRoute
   '/atendimentos/$id/': typeof AppAtendimentosIdIndexRoute
   '/atividades/$id/': typeof AppAtividadesIdIndexRoute
   '/contatos/$id/': typeof AppContatosIdIndexRoute
@@ -225,12 +253,14 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/inicio': typeof AppInicioRoute
+  '/atendidos/novo': typeof AppAtendidosNovoRoute
   '/atendimentos/novo': typeof AppAtendimentosNovoRoute
   '/atividades/novo': typeof AppAtividadesNovoRoute
   '/contatos/novo': typeof AppContatosNovoRoute
   '/editais/novo': typeof AppEditaisNovoRoute
   '/grupos/novo': typeof AppGruposNovoRoute
   '/projetos/novo': typeof AppProjetosNovoRoute
+  '/atendidos': typeof AppAtendidosIndexRoute
   '/atendimentos': typeof AppAtendimentosIndexRoute
   '/atividades': typeof AppAtividadesIndexRoute
   '/configuracoes': typeof AppConfiguracoesIndexRoute
@@ -239,12 +269,14 @@ export interface FileRoutesByTo {
   '/grupos': typeof AppGruposIndexRoute
   '/projetos': typeof AppProjetosIndexRoute
   '/relatorios': typeof AppRelatoriosIndexRoute
+  '/atendidos/$id/editar': typeof AppAtendidosIdEditarRoute
   '/atendimentos/$id/editar': typeof AppAtendimentosIdEditarRoute
   '/atividades/$id/editar': typeof AppAtividadesIdEditarRoute
   '/contatos/$id/editar': typeof AppContatosIdEditarRoute
   '/editais/$id/editar': typeof AppEditaisIdEditarRoute
   '/grupos/$id/editar': typeof AppGruposIdEditarRoute
   '/projetos/$id/editar': typeof AppProjetosIdEditarRoute
+  '/atendidos/$id': typeof AppAtendidosIdIndexRoute
   '/atendimentos/$id': typeof AppAtendimentosIdIndexRoute
   '/atividades/$id': typeof AppAtividadesIdIndexRoute
   '/contatos/$id': typeof AppContatosIdIndexRoute
@@ -258,12 +290,14 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/_app/inicio': typeof AppInicioRoute
+  '/_app/atendidos/novo': typeof AppAtendidosNovoRoute
   '/_app/atendimentos/novo': typeof AppAtendimentosNovoRoute
   '/_app/atividades/novo': typeof AppAtividadesNovoRoute
   '/_app/contatos/novo': typeof AppContatosNovoRoute
   '/_app/editais/novo': typeof AppEditaisNovoRoute
   '/_app/grupos/novo': typeof AppGruposNovoRoute
   '/_app/projetos/novo': typeof AppProjetosNovoRoute
+  '/_app/atendidos/': typeof AppAtendidosIndexRoute
   '/_app/atendimentos/': typeof AppAtendimentosIndexRoute
   '/_app/atividades/': typeof AppAtividadesIndexRoute
   '/_app/configuracoes/': typeof AppConfiguracoesIndexRoute
@@ -272,12 +306,14 @@ export interface FileRoutesById {
   '/_app/grupos/': typeof AppGruposIndexRoute
   '/_app/projetos/': typeof AppProjetosIndexRoute
   '/_app/relatorios/': typeof AppRelatoriosIndexRoute
+  '/_app/atendidos/$id/editar': typeof AppAtendidosIdEditarRoute
   '/_app/atendimentos/$id/editar': typeof AppAtendimentosIdEditarRoute
   '/_app/atividades/$id/editar': typeof AppAtividadesIdEditarRoute
   '/_app/contatos/$id/editar': typeof AppContatosIdEditarRoute
   '/_app/editais/$id/editar': typeof AppEditaisIdEditarRoute
   '/_app/grupos/$id/editar': typeof AppGruposIdEditarRoute
   '/_app/projetos/$id/editar': typeof AppProjetosIdEditarRoute
+  '/_app/atendidos/$id/': typeof AppAtendidosIdIndexRoute
   '/_app/atendimentos/$id/': typeof AppAtendimentosIdIndexRoute
   '/_app/atividades/$id/': typeof AppAtividadesIdIndexRoute
   '/_app/contatos/$id/': typeof AppContatosIdIndexRoute
@@ -291,12 +327,14 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/inicio'
+    | '/atendidos/novo'
     | '/atendimentos/novo'
     | '/atividades/novo'
     | '/contatos/novo'
     | '/editais/novo'
     | '/grupos/novo'
     | '/projetos/novo'
+    | '/atendidos/'
     | '/atendimentos/'
     | '/atividades/'
     | '/configuracoes/'
@@ -305,12 +343,14 @@ export interface FileRouteTypes {
     | '/grupos/'
     | '/projetos/'
     | '/relatorios/'
+    | '/atendidos/$id/editar'
     | '/atendimentos/$id/editar'
     | '/atividades/$id/editar'
     | '/contatos/$id/editar'
     | '/editais/$id/editar'
     | '/grupos/$id/editar'
     | '/projetos/$id/editar'
+    | '/atendidos/$id/'
     | '/atendimentos/$id/'
     | '/atividades/$id/'
     | '/contatos/$id/'
@@ -322,12 +362,14 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/inicio'
+    | '/atendidos/novo'
     | '/atendimentos/novo'
     | '/atividades/novo'
     | '/contatos/novo'
     | '/editais/novo'
     | '/grupos/novo'
     | '/projetos/novo'
+    | '/atendidos'
     | '/atendimentos'
     | '/atividades'
     | '/configuracoes'
@@ -336,12 +378,14 @@ export interface FileRouteTypes {
     | '/grupos'
     | '/projetos'
     | '/relatorios'
+    | '/atendidos/$id/editar'
     | '/atendimentos/$id/editar'
     | '/atividades/$id/editar'
     | '/contatos/$id/editar'
     | '/editais/$id/editar'
     | '/grupos/$id/editar'
     | '/projetos/$id/editar'
+    | '/atendidos/$id'
     | '/atendimentos/$id'
     | '/atividades/$id'
     | '/contatos/$id'
@@ -354,12 +398,14 @@ export interface FileRouteTypes {
     | '/_app'
     | '/auth'
     | '/_app/inicio'
+    | '/_app/atendidos/novo'
     | '/_app/atendimentos/novo'
     | '/_app/atividades/novo'
     | '/_app/contatos/novo'
     | '/_app/editais/novo'
     | '/_app/grupos/novo'
     | '/_app/projetos/novo'
+    | '/_app/atendidos/'
     | '/_app/atendimentos/'
     | '/_app/atividades/'
     | '/_app/configuracoes/'
@@ -368,12 +414,14 @@ export interface FileRouteTypes {
     | '/_app/grupos/'
     | '/_app/projetos/'
     | '/_app/relatorios/'
+    | '/_app/atendidos/$id/editar'
     | '/_app/atendimentos/$id/editar'
     | '/_app/atividades/$id/editar'
     | '/_app/contatos/$id/editar'
     | '/_app/editais/$id/editar'
     | '/_app/grupos/$id/editar'
     | '/_app/projetos/$id/editar'
+    | '/_app/atendidos/$id/'
     | '/_app/atendimentos/$id/'
     | '/_app/atividades/$id/'
     | '/_app/contatos/$id/'
@@ -474,6 +522,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAtendimentosIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/atendidos/': {
+      id: '/_app/atendidos/'
+      path: '/atendidos'
+      fullPath: '/atendidos/'
+      preLoaderRoute: typeof AppAtendidosIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/projetos/novo': {
       id: '/_app/projetos/novo'
       path: '/projetos/novo'
@@ -514,6 +569,13 @@ declare module '@tanstack/react-router' {
       path: '/atendimentos/novo'
       fullPath: '/atendimentos/novo'
       preLoaderRoute: typeof AppAtendimentosNovoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/atendidos/novo': {
+      id: '/_app/atendidos/novo'
+      path: '/atendidos/novo'
+      fullPath: '/atendidos/novo'
+      preLoaderRoute: typeof AppAtendidosNovoRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/projetos/$id/': {
@@ -558,6 +620,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAtendimentosIdIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/atendidos/$id/': {
+      id: '/_app/atendidos/$id/'
+      path: '/atendidos/$id'
+      fullPath: '/atendidos/$id/'
+      preLoaderRoute: typeof AppAtendidosIdIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/projetos/$id/editar': {
       id: '/_app/projetos/$id/editar'
       path: '/projetos/$id/editar'
@@ -600,17 +669,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAtendimentosIdEditarRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/atendidos/$id/editar': {
+      id: '/_app/atendidos/$id/editar'
+      path: '/atendidos/$id/editar'
+      fullPath: '/atendidos/$id/editar'
+      preLoaderRoute: typeof AppAtendidosIdEditarRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
   AppInicioRoute: typeof AppInicioRoute
+  AppAtendidosNovoRoute: typeof AppAtendidosNovoRoute
   AppAtendimentosNovoRoute: typeof AppAtendimentosNovoRoute
   AppAtividadesNovoRoute: typeof AppAtividadesNovoRoute
   AppContatosNovoRoute: typeof AppContatosNovoRoute
   AppEditaisNovoRoute: typeof AppEditaisNovoRoute
   AppGruposNovoRoute: typeof AppGruposNovoRoute
   AppProjetosNovoRoute: typeof AppProjetosNovoRoute
+  AppAtendidosIndexRoute: typeof AppAtendidosIndexRoute
   AppAtendimentosIndexRoute: typeof AppAtendimentosIndexRoute
   AppAtividadesIndexRoute: typeof AppAtividadesIndexRoute
   AppConfiguracoesIndexRoute: typeof AppConfiguracoesIndexRoute
@@ -619,12 +697,14 @@ interface AppRouteChildren {
   AppGruposIndexRoute: typeof AppGruposIndexRoute
   AppProjetosIndexRoute: typeof AppProjetosIndexRoute
   AppRelatoriosIndexRoute: typeof AppRelatoriosIndexRoute
+  AppAtendidosIdEditarRoute: typeof AppAtendidosIdEditarRoute
   AppAtendimentosIdEditarRoute: typeof AppAtendimentosIdEditarRoute
   AppAtividadesIdEditarRoute: typeof AppAtividadesIdEditarRoute
   AppContatosIdEditarRoute: typeof AppContatosIdEditarRoute
   AppEditaisIdEditarRoute: typeof AppEditaisIdEditarRoute
   AppGruposIdEditarRoute: typeof AppGruposIdEditarRoute
   AppProjetosIdEditarRoute: typeof AppProjetosIdEditarRoute
+  AppAtendidosIdIndexRoute: typeof AppAtendidosIdIndexRoute
   AppAtendimentosIdIndexRoute: typeof AppAtendimentosIdIndexRoute
   AppAtividadesIdIndexRoute: typeof AppAtividadesIdIndexRoute
   AppContatosIdIndexRoute: typeof AppContatosIdIndexRoute
@@ -635,12 +715,14 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppInicioRoute: AppInicioRoute,
+  AppAtendidosNovoRoute: AppAtendidosNovoRoute,
   AppAtendimentosNovoRoute: AppAtendimentosNovoRoute,
   AppAtividadesNovoRoute: AppAtividadesNovoRoute,
   AppContatosNovoRoute: AppContatosNovoRoute,
   AppEditaisNovoRoute: AppEditaisNovoRoute,
   AppGruposNovoRoute: AppGruposNovoRoute,
   AppProjetosNovoRoute: AppProjetosNovoRoute,
+  AppAtendidosIndexRoute: AppAtendidosIndexRoute,
   AppAtendimentosIndexRoute: AppAtendimentosIndexRoute,
   AppAtividadesIndexRoute: AppAtividadesIndexRoute,
   AppConfiguracoesIndexRoute: AppConfiguracoesIndexRoute,
@@ -649,12 +731,14 @@ const AppRouteChildren: AppRouteChildren = {
   AppGruposIndexRoute: AppGruposIndexRoute,
   AppProjetosIndexRoute: AppProjetosIndexRoute,
   AppRelatoriosIndexRoute: AppRelatoriosIndexRoute,
+  AppAtendidosIdEditarRoute: AppAtendidosIdEditarRoute,
   AppAtendimentosIdEditarRoute: AppAtendimentosIdEditarRoute,
   AppAtividadesIdEditarRoute: AppAtividadesIdEditarRoute,
   AppContatosIdEditarRoute: AppContatosIdEditarRoute,
   AppEditaisIdEditarRoute: AppEditaisIdEditarRoute,
   AppGruposIdEditarRoute: AppGruposIdEditarRoute,
   AppProjetosIdEditarRoute: AppProjetosIdEditarRoute,
+  AppAtendidosIdIndexRoute: AppAtendidosIdIndexRoute,
   AppAtendimentosIdIndexRoute: AppAtendimentosIdIndexRoute,
   AppAtividadesIdIndexRoute: AppAtividadesIdIndexRoute,
   AppContatosIdIndexRoute: AppContatosIdIndexRoute,

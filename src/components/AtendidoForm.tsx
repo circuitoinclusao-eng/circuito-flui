@@ -118,7 +118,7 @@ export function AtendidoForm({ id }: Props) {
       // Marcadores: substituir
       await supabase.from("atendido_marcadores").delete().eq("atendido_id", atendidoId!);
       if (marcadores.length) {
-        await supabase.from("atendido_marcadores").insert(marcadores.map((m) => ({ atendido_id: atendidoId, marcador: m })));
+        await supabase.from("atendido_marcadores").insert(marcadores.map((m) => ({ atendido_id: atendidoId!, marcador: m })));
       }
 
       // Vínculos: substituir
@@ -126,7 +126,7 @@ export function AtendidoForm({ id }: Props) {
       const vinculosLimpos = vinculos.filter((vi) => vi.projeto_id || vi.atividade_id || vi.grupo_id);
       if (vinculosLimpos.length) {
         await supabase.from("atendido_projetos").insert(vinculosLimpos.map((vi) => ({
-          atendido_id: atendidoId, projeto_id: vi.projeto_id || null, atividade_id: vi.atividade_id || null,
+          atendido_id: atendidoId!, projeto_id: vi.projeto_id || null, atividade_id: vi.atividade_id || null,
           grupo_id: vi.grupo_id || null, data_entrada: vi.data_entrada || null, status: vi.status || "ativo",
         })));
       }
@@ -315,7 +315,14 @@ function CheckField({ label, checked, onChange }: any) {
     </label>
   );
 }
-function SelectBox({ value, onChange, options }: { value: any; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
+function CheckField({ label, checked, onChange }: { label: string; checked: boolean; onChange: (c: boolean) => void }) {
+  return (
+    <label className="flex items-center gap-2 text-sm cursor-pointer">
+      <Checkbox checked={checked} onCheckedChange={(c) => onChange(c === true)} /> {label}
+    </label>
+  );
+}
+function SelectBox({ value, onChange, options }: { value: any; onChange: (v: string) => void; options: ReadonlyArray<{ value: string; label: string }> }) {
   return (
     <Select value={value ?? undefined} onValueChange={onChange}>
       <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
