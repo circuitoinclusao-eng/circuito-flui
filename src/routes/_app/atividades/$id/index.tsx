@@ -366,7 +366,7 @@ function FotosDialog({ open, onClose, atividadeId, mes, ano, fotos, reload }: an
         <DialogHeader><DialogTitle>Fotos — {mes}/{ano}</DialogTitle></DialogHeader>
         <div className="space-y-3">
           <Input placeholder="Legenda (opcional, aplicada às próximas fotos enviadas)" value={legenda} onChange={(e) => setLegenda(e.target.value)} />
-          <Input type="file" accept="image/*" multiple disabled={busy} onChange={upload} />
+          <Input type="file" accept="image/*" capture="environment" multiple disabled={busy} onChange={upload} />
           {busy && <p className="text-sm text-muted-foreground">Enviando...</p>}
           {fotos.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
