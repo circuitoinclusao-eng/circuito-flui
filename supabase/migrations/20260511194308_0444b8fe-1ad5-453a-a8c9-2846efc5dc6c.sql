@@ -1,0 +1,2 @@
+ALTER TABLE public.atendidos ADD COLUMN IF NOT EXISTS id_externo text, ADD COLUMN IF NOT EXISTS genero text, ADD COLUMN IF NOT EXISTS escolaridade text;
+CREATE INDEX IF NOT EXISTS idx_atendidos_id_externo ON public.atendidos(id_externo);
