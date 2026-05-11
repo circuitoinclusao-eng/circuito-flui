@@ -29,6 +29,7 @@ import { Route as AppProjetosIdIndexRouteImport } from './routes/_app/projetos/$
 import { Route as AppGruposIdIndexRouteImport } from './routes/_app/grupos/$id/index'
 import { Route as AppEditaisIdIndexRouteImport } from './routes/_app/editais/$id/index'
 import { Route as AppContatosIdIndexRouteImport } from './routes/_app/contatos/$id/index'
+import { Route as AppAtividadesIdIndexRouteImport } from './routes/_app/atividades/$id/index'
 import { Route as AppAtendimentosIdIndexRouteImport } from './routes/_app/atendimentos/$id/index'
 import { Route as AppProjetosIdEditarRouteImport } from './routes/_app/projetos/$id/editar'
 import { Route as AppGruposIdEditarRouteImport } from './routes/_app/grupos/$id/editar'
@@ -136,6 +137,11 @@ const AppContatosIdIndexRoute = AppContatosIdIndexRouteImport.update({
   path: '/contatos/$id/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAtividadesIdIndexRoute = AppAtividadesIdIndexRouteImport.update({
+  id: '/atividades/$id/',
+  path: '/atividades/$id/',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppAtendimentosIdIndexRoute = AppAtendimentosIdIndexRouteImport.update({
   id: '/atendimentos/$id/',
   path: '/atendimentos/$id/',
@@ -195,6 +201,7 @@ export interface FileRoutesByFullPath {
   '/grupos/$id/editar': typeof AppGruposIdEditarRoute
   '/projetos/$id/editar': typeof AppProjetosIdEditarRoute
   '/atendimentos/$id/': typeof AppAtendimentosIdIndexRoute
+  '/atividades/$id/': typeof AppAtividadesIdIndexRoute
   '/contatos/$id/': typeof AppContatosIdIndexRoute
   '/editais/$id/': typeof AppEditaisIdIndexRoute
   '/grupos/$id/': typeof AppGruposIdIndexRoute
@@ -223,6 +230,7 @@ export interface FileRoutesByTo {
   '/grupos/$id/editar': typeof AppGruposIdEditarRoute
   '/projetos/$id/editar': typeof AppProjetosIdEditarRoute
   '/atendimentos/$id': typeof AppAtendimentosIdIndexRoute
+  '/atividades/$id': typeof AppAtividadesIdIndexRoute
   '/contatos/$id': typeof AppContatosIdIndexRoute
   '/editais/$id': typeof AppEditaisIdIndexRoute
   '/grupos/$id': typeof AppGruposIdIndexRoute
@@ -253,6 +261,7 @@ export interface FileRoutesById {
   '/_app/grupos/$id/editar': typeof AppGruposIdEditarRoute
   '/_app/projetos/$id/editar': typeof AppProjetosIdEditarRoute
   '/_app/atendimentos/$id/': typeof AppAtendimentosIdIndexRoute
+  '/_app/atividades/$id/': typeof AppAtividadesIdIndexRoute
   '/_app/contatos/$id/': typeof AppContatosIdIndexRoute
   '/_app/editais/$id/': typeof AppEditaisIdIndexRoute
   '/_app/grupos/$id/': typeof AppGruposIdIndexRoute
@@ -283,6 +292,7 @@ export interface FileRouteTypes {
     | '/grupos/$id/editar'
     | '/projetos/$id/editar'
     | '/atendimentos/$id/'
+    | '/atividades/$id/'
     | '/contatos/$id/'
     | '/editais/$id/'
     | '/grupos/$id/'
@@ -311,6 +321,7 @@ export interface FileRouteTypes {
     | '/grupos/$id/editar'
     | '/projetos/$id/editar'
     | '/atendimentos/$id'
+    | '/atividades/$id'
     | '/contatos/$id'
     | '/editais/$id'
     | '/grupos/$id'
@@ -340,6 +351,7 @@ export interface FileRouteTypes {
     | '/_app/grupos/$id/editar'
     | '/_app/projetos/$id/editar'
     | '/_app/atendimentos/$id/'
+    | '/_app/atividades/$id/'
     | '/_app/contatos/$id/'
     | '/_app/editais/$id/'
     | '/_app/grupos/$id/'
@@ -494,6 +506,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppContatosIdIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/atividades/$id/': {
+      id: '/_app/atividades/$id/'
+      path: '/atividades/$id'
+      fullPath: '/atividades/$id/'
+      preLoaderRoute: typeof AppAtividadesIdIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/atendimentos/$id/': {
       id: '/_app/atendimentos/$id/'
       path: '/atendimentos/$id'
@@ -567,6 +586,7 @@ interface AppRouteChildren {
   AppGruposIdEditarRoute: typeof AppGruposIdEditarRoute
   AppProjetosIdEditarRoute: typeof AppProjetosIdEditarRoute
   AppAtendimentosIdIndexRoute: typeof AppAtendimentosIdIndexRoute
+  AppAtividadesIdIndexRoute: typeof AppAtividadesIdIndexRoute
   AppContatosIdIndexRoute: typeof AppContatosIdIndexRoute
   AppEditaisIdIndexRoute: typeof AppEditaisIdIndexRoute
   AppGruposIdIndexRoute: typeof AppGruposIdIndexRoute
@@ -594,6 +614,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppGruposIdEditarRoute: AppGruposIdEditarRoute,
   AppProjetosIdEditarRoute: AppProjetosIdEditarRoute,
   AppAtendimentosIdIndexRoute: AppAtendimentosIdIndexRoute,
+  AppAtividadesIdIndexRoute: AppAtividadesIdIndexRoute,
   AppContatosIdIndexRoute: AppContatosIdIndexRoute,
   AppEditaisIdIndexRoute: AppEditaisIdIndexRoute,
   AppGruposIdIndexRoute: AppGruposIdIndexRoute,
