@@ -193,7 +193,10 @@ function Dashboard() {
 
   return (
     <>
-      <PageHeader breadcrumb={["Início"]} title="Painel geral" />
+      <PageHeader breadcrumb={["Início"]} title={isProfessorOnly ? "Minhas turmas" : "Painel geral"} />
+      {isProfessorOnly && (
+        <p className="text-sm text-muted-foreground -mt-2 mb-4">Mostrando apenas as atividades em que você é educador.</p>
+      )}
 
       {/* KPIs prioritários */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
