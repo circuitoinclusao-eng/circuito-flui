@@ -9,7 +9,7 @@ import {
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, FileDown, Filter, Eye, EyeOff, Search, MoreVertical, Tag, Users as UsersIcon, Upload } from "lucide-react";
+import { Plus, FileDown, Filter, Eye, EyeOff, Search, MoreVertical, Tag, Users as UsersIcon, Upload, Trash2 } from "lucide-react";
 import { ATENDIDO_STATUS, calcularIdade, hideCPF, maskCPF, statusClass, statusLabel, MARCADORES_PADRAO } from "@/lib/atendidos";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
