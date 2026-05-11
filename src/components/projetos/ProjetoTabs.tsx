@@ -31,7 +31,7 @@ export function MetasTab({ projetoId }: { projetoId: string }) {
   }
   async function del(id: string) { await supabase.from("projeto_metas").delete().eq("id", id); reload(); }
   async function updateField(id: string, k: string, v: any) {
-    await supabase.from("projeto_metas").update({ [k]: v }).eq("id", id); reload();
+    await supabase.from("projeto_metas").update({ [k]: v } as any).eq("id", id); reload();
   }
   return (
     <div className="space-y-3">
