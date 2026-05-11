@@ -119,9 +119,29 @@ function ListaAtendidos() {
     const inserts = Array.from(sel).map((atendido_id) => ({ atendido_id, grupo_id: id, status: "ativo", data_entrada: new Date().toISOString().slice(0, 10) }));
     const { error } = await supabase.from("atendido_projetos").insert(inserts);
     if (error) toast.error(error.message); else { toast.success("Adicionados ao grupo."); load(); setSel(new Set()); }
+  async function excluirSelecionados() {
+    if (!isAdmin) return;
+    const ids = Array.from(sel);
+    if (!ids.length) return;
+    if (!confirm(`Excluir definitivamente ${ids.length} atendido${ids.length > 1 ? "s" : ""}? Esta ação não pode ser desfeita.`)) return;
+    await supabase.from("atendido_marcadores").delete().in("atendido_id", ids);
+    await supabase.from("atendido_projetos").delete().in("atendido_id", ids);
+    await supabase.from("atendido_documentos").delete().in("atendido_id", ids);
+    const { error } = await supabase.from("atendidos").delete().in("id", ids);
+    if (error) toast.error(error.message);
+    else { toast.success("Atendidos excluídos."); setSel(new Set()); load(); }
+  }
+  async function excluirIndividual(id: string, nome: string) {
+    if (!isAdmin) return;
+    if (!confirm(`Excluir definitivamente "${nome}"? Esta ação não pode ser desfeita.`)) return;
+    await supabase.from("atendido_marcadores").delete().eq("atendido_id", id);
+    await supabase.from("atendido_projetos").delete().eq("atendido_id", id);
+    await supabase.from("atendido_documentos").delete().eq("atendido_id", id);
+    const { error } = await supabase.from("atendidos").delete().eq("id", id);
+    if (error) toast.error(error.message);
+    else { toast.success("Atendido excluído."); load(); }
   }
 
-  function exportCSV() {
     const headers = ["matricula", "nome", "status", "data_nascimento", "idade", "cpf", "telefone", "cidade", "responsavel_nome", "projeto", "grupo"];
     const lines = [headers.join(",")];
     filtered.forEach((r) => {
