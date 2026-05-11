@@ -9,38 +9,401 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppInicioRouteImport } from './routes/_app/inicio'
+import { Route as AppRelatoriosIndexRouteImport } from './routes/_app/relatorios/index'
+import { Route as AppProjetosIndexRouteImport } from './routes/_app/projetos/index'
+import { Route as AppGruposIndexRouteImport } from './routes/_app/grupos/index'
+import { Route as AppEditaisIndexRouteImport } from './routes/_app/editais/index'
+import { Route as AppContatosIndexRouteImport } from './routes/_app/contatos/index'
+import { Route as AppConfiguracoesIndexRouteImport } from './routes/_app/configuracoes/index'
+import { Route as AppAtividadesIndexRouteImport } from './routes/_app/atividades/index'
+import { Route as AppAtendimentosIndexRouteImport } from './routes/_app/atendimentos/index'
+import { Route as AppProjetosNovoRouteImport } from './routes/_app/projetos/novo'
+import { Route as AppGruposNovoRouteImport } from './routes/_app/grupos/novo'
+import { Route as AppEditaisNovoRouteImport } from './routes/_app/editais/novo'
+import { Route as AppContatosNovoRouteImport } from './routes/_app/contatos/novo'
+import { Route as AppAtividadesNovoRouteImport } from './routes/_app/atividades/novo'
+import { Route as AppAtendimentosNovoRouteImport } from './routes/_app/atendimentos/novo'
+import { Route as AppProjetosIdIndexRouteImport } from './routes/_app/projetos/$id/index'
+import { Route as AppGruposIdIndexRouteImport } from './routes/_app/grupos/$id/index'
+import { Route as AppEditaisIdIndexRouteImport } from './routes/_app/editais/$id/index'
+import { Route as AppContatosIdIndexRouteImport } from './routes/_app/contatos/$id/index'
+import { Route as AppAtividadesIdIndexRouteImport } from './routes/_app/atividades/$id/index'
+import { Route as AppAtendimentosIdIndexRouteImport } from './routes/_app/atendimentos/$id/index'
+import { Route as AppProjetosIdEditarRouteImport } from './routes/_app/projetos/$id/editar'
+import { Route as AppGruposIdEditarRouteImport } from './routes/_app/grupos/$id/editar'
+import { Route as AppEditaisIdEditarRouteImport } from './routes/_app/editais/$id/editar'
+import { Route as AppContatosIdEditarRouteImport } from './routes/_app/contatos/$id/editar'
+import { Route as AppAtividadesIdEditarRouteImport } from './routes/_app/atividades/$id/editar'
+import { Route as AppAtendimentosIdEditarRouteImport } from './routes/_app/atendimentos/$id/editar'
 
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppInicioRoute = AppInicioRouteImport.update({
+  id: '/inicio',
+  path: '/inicio',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRelatoriosIndexRoute = AppRelatoriosIndexRouteImport.update({
+  id: '/relatorios/',
+  path: '/relatorios/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProjetosIndexRoute = AppProjetosIndexRouteImport.update({
+  id: '/projetos/',
+  path: '/projetos/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppGruposIndexRoute = AppGruposIndexRouteImport.update({
+  id: '/grupos/',
+  path: '/grupos/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppEditaisIndexRoute = AppEditaisIndexRouteImport.update({
+  id: '/editais/',
+  path: '/editais/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppContatosIndexRoute = AppContatosIndexRouteImport.update({
+  id: '/contatos/',
+  path: '/contatos/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppConfiguracoesIndexRoute = AppConfiguracoesIndexRouteImport.update({
+  id: '/configuracoes/',
+  path: '/configuracoes/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAtividadesIndexRoute = AppAtividadesIndexRouteImport.update({
+  id: '/atividades/',
+  path: '/atividades/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAtendimentosIndexRoute = AppAtendimentosIndexRouteImport.update({
+  id: '/atendimentos/',
+  path: '/atendimentos/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProjetosNovoRoute = AppProjetosNovoRouteImport.update({
+  id: '/projetos/novo',
+  path: '/projetos/novo',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppGruposNovoRoute = AppGruposNovoRouteImport.update({
+  id: '/grupos/novo',
+  path: '/grupos/novo',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppEditaisNovoRoute = AppEditaisNovoRouteImport.update({
+  id: '/editais/novo',
+  path: '/editais/novo',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppContatosNovoRoute = AppContatosNovoRouteImport.update({
+  id: '/contatos/novo',
+  path: '/contatos/novo',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAtividadesNovoRoute = AppAtividadesNovoRouteImport.update({
+  id: '/atividades/novo',
+  path: '/atividades/novo',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAtendimentosNovoRoute = AppAtendimentosNovoRouteImport.update({
+  id: '/atendimentos/novo',
+  path: '/atendimentos/novo',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProjetosIdIndexRoute = AppProjetosIdIndexRouteImport.update({
+  id: '/projetos/$id/',
+  path: '/projetos/$id/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppGruposIdIndexRoute = AppGruposIdIndexRouteImport.update({
+  id: '/grupos/$id/',
+  path: '/grupos/$id/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppEditaisIdIndexRoute = AppEditaisIdIndexRouteImport.update({
+  id: '/editais/$id/',
+  path: '/editais/$id/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppContatosIdIndexRoute = AppContatosIdIndexRouteImport.update({
+  id: '/contatos/$id/',
+  path: '/contatos/$id/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAtividadesIdIndexRoute = AppAtividadesIdIndexRouteImport.update({
+  id: '/atividades/$id/',
+  path: '/atividades/$id/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAtendimentosIdIndexRoute = AppAtendimentosIdIndexRouteImport.update({
+  id: '/atendimentos/$id/',
+  path: '/atendimentos/$id/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProjetosIdEditarRoute = AppProjetosIdEditarRouteImport.update({
+  id: '/projetos/$id/editar',
+  path: '/projetos/$id/editar',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppGruposIdEditarRoute = AppGruposIdEditarRouteImport.update({
+  id: '/grupos/$id/editar',
+  path: '/grupos/$id/editar',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppEditaisIdEditarRoute = AppEditaisIdEditarRouteImport.update({
+  id: '/editais/$id/editar',
+  path: '/editais/$id/editar',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppContatosIdEditarRoute = AppContatosIdEditarRouteImport.update({
+  id: '/contatos/$id/editar',
+  path: '/contatos/$id/editar',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAtividadesIdEditarRoute = AppAtividadesIdEditarRouteImport.update({
+  id: '/atividades/$id/editar',
+  path: '/atividades/$id/editar',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAtendimentosIdEditarRoute = AppAtendimentosIdEditarRouteImport.update({
+  id: '/atendimentos/$id/editar',
+  path: '/atendimentos/$id/editar',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/inicio': typeof AppInicioRoute
+  '/atendimentos/novo': typeof AppAtendimentosNovoRoute
+  '/atividades/novo': typeof AppAtividadesNovoRoute
+  '/contatos/novo': typeof AppContatosNovoRoute
+  '/editais/novo': typeof AppEditaisNovoRoute
+  '/grupos/novo': typeof AppGruposNovoRoute
+  '/projetos/novo': typeof AppProjetosNovoRoute
+  '/atendimentos/': typeof AppAtendimentosIndexRoute
+  '/atividades/': typeof AppAtividadesIndexRoute
+  '/configuracoes/': typeof AppConfiguracoesIndexRoute
+  '/contatos/': typeof AppContatosIndexRoute
+  '/editais/': typeof AppEditaisIndexRoute
+  '/grupos/': typeof AppGruposIndexRoute
+  '/projetos/': typeof AppProjetosIndexRoute
+  '/relatorios/': typeof AppRelatoriosIndexRoute
+  '/atendimentos/$id/editar': typeof AppAtendimentosIdEditarRoute
+  '/atividades/$id/editar': typeof AppAtividadesIdEditarRoute
+  '/contatos/$id/editar': typeof AppContatosIdEditarRoute
+  '/editais/$id/editar': typeof AppEditaisIdEditarRoute
+  '/grupos/$id/editar': typeof AppGruposIdEditarRoute
+  '/projetos/$id/editar': typeof AppProjetosIdEditarRoute
+  '/atendimentos/$id/': typeof AppAtendimentosIdIndexRoute
+  '/atividades/$id/': typeof AppAtividadesIdIndexRoute
+  '/contatos/$id/': typeof AppContatosIdIndexRoute
+  '/editais/$id/': typeof AppEditaisIdIndexRoute
+  '/grupos/$id/': typeof AppGruposIdIndexRoute
+  '/projetos/$id/': typeof AppProjetosIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/inicio': typeof AppInicioRoute
+  '/atendimentos/novo': typeof AppAtendimentosNovoRoute
+  '/atividades/novo': typeof AppAtividadesNovoRoute
+  '/contatos/novo': typeof AppContatosNovoRoute
+  '/editais/novo': typeof AppEditaisNovoRoute
+  '/grupos/novo': typeof AppGruposNovoRoute
+  '/projetos/novo': typeof AppProjetosNovoRoute
+  '/atendimentos': typeof AppAtendimentosIndexRoute
+  '/atividades': typeof AppAtividadesIndexRoute
+  '/configuracoes': typeof AppConfiguracoesIndexRoute
+  '/contatos': typeof AppContatosIndexRoute
+  '/editais': typeof AppEditaisIndexRoute
+  '/grupos': typeof AppGruposIndexRoute
+  '/projetos': typeof AppProjetosIndexRoute
+  '/relatorios': typeof AppRelatoriosIndexRoute
+  '/atendimentos/$id/editar': typeof AppAtendimentosIdEditarRoute
+  '/atividades/$id/editar': typeof AppAtividadesIdEditarRoute
+  '/contatos/$id/editar': typeof AppContatosIdEditarRoute
+  '/editais/$id/editar': typeof AppEditaisIdEditarRoute
+  '/grupos/$id/editar': typeof AppGruposIdEditarRoute
+  '/projetos/$id/editar': typeof AppProjetosIdEditarRoute
+  '/atendimentos/$id': typeof AppAtendimentosIdIndexRoute
+  '/atividades/$id': typeof AppAtividadesIdIndexRoute
+  '/contatos/$id': typeof AppContatosIdIndexRoute
+  '/editais/$id': typeof AppEditaisIdIndexRoute
+  '/grupos/$id': typeof AppGruposIdIndexRoute
+  '/projetos/$id': typeof AppProjetosIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_app/inicio': typeof AppInicioRoute
+  '/_app/atendimentos/novo': typeof AppAtendimentosNovoRoute
+  '/_app/atividades/novo': typeof AppAtividadesNovoRoute
+  '/_app/contatos/novo': typeof AppContatosNovoRoute
+  '/_app/editais/novo': typeof AppEditaisNovoRoute
+  '/_app/grupos/novo': typeof AppGruposNovoRoute
+  '/_app/projetos/novo': typeof AppProjetosNovoRoute
+  '/_app/atendimentos/': typeof AppAtendimentosIndexRoute
+  '/_app/atividades/': typeof AppAtividadesIndexRoute
+  '/_app/configuracoes/': typeof AppConfiguracoesIndexRoute
+  '/_app/contatos/': typeof AppContatosIndexRoute
+  '/_app/editais/': typeof AppEditaisIndexRoute
+  '/_app/grupos/': typeof AppGruposIndexRoute
+  '/_app/projetos/': typeof AppProjetosIndexRoute
+  '/_app/relatorios/': typeof AppRelatoriosIndexRoute
+  '/_app/atendimentos/$id/editar': typeof AppAtendimentosIdEditarRoute
+  '/_app/atividades/$id/editar': typeof AppAtividadesIdEditarRoute
+  '/_app/contatos/$id/editar': typeof AppContatosIdEditarRoute
+  '/_app/editais/$id/editar': typeof AppEditaisIdEditarRoute
+  '/_app/grupos/$id/editar': typeof AppGruposIdEditarRoute
+  '/_app/projetos/$id/editar': typeof AppProjetosIdEditarRoute
+  '/_app/atendimentos/$id/': typeof AppAtendimentosIdIndexRoute
+  '/_app/atividades/$id/': typeof AppAtividadesIdIndexRoute
+  '/_app/contatos/$id/': typeof AppContatosIdIndexRoute
+  '/_app/editais/$id/': typeof AppEditaisIdIndexRoute
+  '/_app/grupos/$id/': typeof AppGruposIdIndexRoute
+  '/_app/projetos/$id/': typeof AppProjetosIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/inicio'
+    | '/atendimentos/novo'
+    | '/atividades/novo'
+    | '/contatos/novo'
+    | '/editais/novo'
+    | '/grupos/novo'
+    | '/projetos/novo'
+    | '/atendimentos/'
+    | '/atividades/'
+    | '/configuracoes/'
+    | '/contatos/'
+    | '/editais/'
+    | '/grupos/'
+    | '/projetos/'
+    | '/relatorios/'
+    | '/atendimentos/$id/editar'
+    | '/atividades/$id/editar'
+    | '/contatos/$id/editar'
+    | '/editais/$id/editar'
+    | '/grupos/$id/editar'
+    | '/projetos/$id/editar'
+    | '/atendimentos/$id/'
+    | '/atividades/$id/'
+    | '/contatos/$id/'
+    | '/editais/$id/'
+    | '/grupos/$id/'
+    | '/projetos/$id/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/inicio'
+    | '/atendimentos/novo'
+    | '/atividades/novo'
+    | '/contatos/novo'
+    | '/editais/novo'
+    | '/grupos/novo'
+    | '/projetos/novo'
+    | '/atendimentos'
+    | '/atividades'
+    | '/configuracoes'
+    | '/contatos'
+    | '/editais'
+    | '/grupos'
+    | '/projetos'
+    | '/relatorios'
+    | '/atendimentos/$id/editar'
+    | '/atividades/$id/editar'
+    | '/contatos/$id/editar'
+    | '/editais/$id/editar'
+    | '/grupos/$id/editar'
+    | '/projetos/$id/editar'
+    | '/atendimentos/$id'
+    | '/atividades/$id'
+    | '/contatos/$id'
+    | '/editais/$id'
+    | '/grupos/$id'
+    | '/projetos/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/auth'
+    | '/_app/inicio'
+    | '/_app/atendimentos/novo'
+    | '/_app/atividades/novo'
+    | '/_app/contatos/novo'
+    | '/_app/editais/novo'
+    | '/_app/grupos/novo'
+    | '/_app/projetos/novo'
+    | '/_app/atendimentos/'
+    | '/_app/atividades/'
+    | '/_app/configuracoes/'
+    | '/_app/contatos/'
+    | '/_app/editais/'
+    | '/_app/grupos/'
+    | '/_app/projetos/'
+    | '/_app/relatorios/'
+    | '/_app/atendimentos/$id/editar'
+    | '/_app/atividades/$id/editar'
+    | '/_app/contatos/$id/editar'
+    | '/_app/editais/$id/editar'
+    | '/_app/grupos/$id/editar'
+    | '/_app/projetos/$id/editar'
+    | '/_app/atendimentos/$id/'
+    | '/_app/atividades/$id/'
+    | '/_app/contatos/$id/'
+    | '/_app/editais/$id/'
+    | '/_app/grupos/$id/'
+    | '/_app/projetos/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +411,265 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/inicio': {
+      id: '/_app/inicio'
+      path: '/inicio'
+      fullPath: '/inicio'
+      preLoaderRoute: typeof AppInicioRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/relatorios/': {
+      id: '/_app/relatorios/'
+      path: '/relatorios'
+      fullPath: '/relatorios/'
+      preLoaderRoute: typeof AppRelatoriosIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/projetos/': {
+      id: '/_app/projetos/'
+      path: '/projetos'
+      fullPath: '/projetos/'
+      preLoaderRoute: typeof AppProjetosIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/grupos/': {
+      id: '/_app/grupos/'
+      path: '/grupos'
+      fullPath: '/grupos/'
+      preLoaderRoute: typeof AppGruposIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/editais/': {
+      id: '/_app/editais/'
+      path: '/editais'
+      fullPath: '/editais/'
+      preLoaderRoute: typeof AppEditaisIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/contatos/': {
+      id: '/_app/contatos/'
+      path: '/contatos'
+      fullPath: '/contatos/'
+      preLoaderRoute: typeof AppContatosIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/configuracoes/': {
+      id: '/_app/configuracoes/'
+      path: '/configuracoes'
+      fullPath: '/configuracoes/'
+      preLoaderRoute: typeof AppConfiguracoesIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/atividades/': {
+      id: '/_app/atividades/'
+      path: '/atividades'
+      fullPath: '/atividades/'
+      preLoaderRoute: typeof AppAtividadesIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/atendimentos/': {
+      id: '/_app/atendimentos/'
+      path: '/atendimentos'
+      fullPath: '/atendimentos/'
+      preLoaderRoute: typeof AppAtendimentosIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/projetos/novo': {
+      id: '/_app/projetos/novo'
+      path: '/projetos/novo'
+      fullPath: '/projetos/novo'
+      preLoaderRoute: typeof AppProjetosNovoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/grupos/novo': {
+      id: '/_app/grupos/novo'
+      path: '/grupos/novo'
+      fullPath: '/grupos/novo'
+      preLoaderRoute: typeof AppGruposNovoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/editais/novo': {
+      id: '/_app/editais/novo'
+      path: '/editais/novo'
+      fullPath: '/editais/novo'
+      preLoaderRoute: typeof AppEditaisNovoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/contatos/novo': {
+      id: '/_app/contatos/novo'
+      path: '/contatos/novo'
+      fullPath: '/contatos/novo'
+      preLoaderRoute: typeof AppContatosNovoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/atividades/novo': {
+      id: '/_app/atividades/novo'
+      path: '/atividades/novo'
+      fullPath: '/atividades/novo'
+      preLoaderRoute: typeof AppAtividadesNovoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/atendimentos/novo': {
+      id: '/_app/atendimentos/novo'
+      path: '/atendimentos/novo'
+      fullPath: '/atendimentos/novo'
+      preLoaderRoute: typeof AppAtendimentosNovoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/projetos/$id/': {
+      id: '/_app/projetos/$id/'
+      path: '/projetos/$id'
+      fullPath: '/projetos/$id/'
+      preLoaderRoute: typeof AppProjetosIdIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/grupos/$id/': {
+      id: '/_app/grupos/$id/'
+      path: '/grupos/$id'
+      fullPath: '/grupos/$id/'
+      preLoaderRoute: typeof AppGruposIdIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/editais/$id/': {
+      id: '/_app/editais/$id/'
+      path: '/editais/$id'
+      fullPath: '/editais/$id/'
+      preLoaderRoute: typeof AppEditaisIdIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/contatos/$id/': {
+      id: '/_app/contatos/$id/'
+      path: '/contatos/$id'
+      fullPath: '/contatos/$id/'
+      preLoaderRoute: typeof AppContatosIdIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/atividades/$id/': {
+      id: '/_app/atividades/$id/'
+      path: '/atividades/$id'
+      fullPath: '/atividades/$id/'
+      preLoaderRoute: typeof AppAtividadesIdIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/atendimentos/$id/': {
+      id: '/_app/atendimentos/$id/'
+      path: '/atendimentos/$id'
+      fullPath: '/atendimentos/$id/'
+      preLoaderRoute: typeof AppAtendimentosIdIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/projetos/$id/editar': {
+      id: '/_app/projetos/$id/editar'
+      path: '/projetos/$id/editar'
+      fullPath: '/projetos/$id/editar'
+      preLoaderRoute: typeof AppProjetosIdEditarRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/grupos/$id/editar': {
+      id: '/_app/grupos/$id/editar'
+      path: '/grupos/$id/editar'
+      fullPath: '/grupos/$id/editar'
+      preLoaderRoute: typeof AppGruposIdEditarRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/editais/$id/editar': {
+      id: '/_app/editais/$id/editar'
+      path: '/editais/$id/editar'
+      fullPath: '/editais/$id/editar'
+      preLoaderRoute: typeof AppEditaisIdEditarRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/contatos/$id/editar': {
+      id: '/_app/contatos/$id/editar'
+      path: '/contatos/$id/editar'
+      fullPath: '/contatos/$id/editar'
+      preLoaderRoute: typeof AppContatosIdEditarRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/atividades/$id/editar': {
+      id: '/_app/atividades/$id/editar'
+      path: '/atividades/$id/editar'
+      fullPath: '/atividades/$id/editar'
+      preLoaderRoute: typeof AppAtividadesIdEditarRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/atendimentos/$id/editar': {
+      id: '/_app/atendimentos/$id/editar'
+      path: '/atendimentos/$id/editar'
+      fullPath: '/atendimentos/$id/editar'
+      preLoaderRoute: typeof AppAtendimentosIdEditarRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppInicioRoute: typeof AppInicioRoute
+  AppAtendimentosNovoRoute: typeof AppAtendimentosNovoRoute
+  AppAtividadesNovoRoute: typeof AppAtividadesNovoRoute
+  AppContatosNovoRoute: typeof AppContatosNovoRoute
+  AppEditaisNovoRoute: typeof AppEditaisNovoRoute
+  AppGruposNovoRoute: typeof AppGruposNovoRoute
+  AppProjetosNovoRoute: typeof AppProjetosNovoRoute
+  AppAtendimentosIndexRoute: typeof AppAtendimentosIndexRoute
+  AppAtividadesIndexRoute: typeof AppAtividadesIndexRoute
+  AppConfiguracoesIndexRoute: typeof AppConfiguracoesIndexRoute
+  AppContatosIndexRoute: typeof AppContatosIndexRoute
+  AppEditaisIndexRoute: typeof AppEditaisIndexRoute
+  AppGruposIndexRoute: typeof AppGruposIndexRoute
+  AppProjetosIndexRoute: typeof AppProjetosIndexRoute
+  AppRelatoriosIndexRoute: typeof AppRelatoriosIndexRoute
+  AppAtendimentosIdEditarRoute: typeof AppAtendimentosIdEditarRoute
+  AppAtividadesIdEditarRoute: typeof AppAtividadesIdEditarRoute
+  AppContatosIdEditarRoute: typeof AppContatosIdEditarRoute
+  AppEditaisIdEditarRoute: typeof AppEditaisIdEditarRoute
+  AppGruposIdEditarRoute: typeof AppGruposIdEditarRoute
+  AppProjetosIdEditarRoute: typeof AppProjetosIdEditarRoute
+  AppAtendimentosIdIndexRoute: typeof AppAtendimentosIdIndexRoute
+  AppAtividadesIdIndexRoute: typeof AppAtividadesIdIndexRoute
+  AppContatosIdIndexRoute: typeof AppContatosIdIndexRoute
+  AppEditaisIdIndexRoute: typeof AppEditaisIdIndexRoute
+  AppGruposIdIndexRoute: typeof AppGruposIdIndexRoute
+  AppProjetosIdIndexRoute: typeof AppProjetosIdIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppInicioRoute: AppInicioRoute,
+  AppAtendimentosNovoRoute: AppAtendimentosNovoRoute,
+  AppAtividadesNovoRoute: AppAtividadesNovoRoute,
+  AppContatosNovoRoute: AppContatosNovoRoute,
+  AppEditaisNovoRoute: AppEditaisNovoRoute,
+  AppGruposNovoRoute: AppGruposNovoRoute,
+  AppProjetosNovoRoute: AppProjetosNovoRoute,
+  AppAtendimentosIndexRoute: AppAtendimentosIndexRoute,
+  AppAtividadesIndexRoute: AppAtividadesIndexRoute,
+  AppConfiguracoesIndexRoute: AppConfiguracoesIndexRoute,
+  AppContatosIndexRoute: AppContatosIndexRoute,
+  AppEditaisIndexRoute: AppEditaisIndexRoute,
+  AppGruposIndexRoute: AppGruposIndexRoute,
+  AppProjetosIndexRoute: AppProjetosIndexRoute,
+  AppRelatoriosIndexRoute: AppRelatoriosIndexRoute,
+  AppAtendimentosIdEditarRoute: AppAtendimentosIdEditarRoute,
+  AppAtividadesIdEditarRoute: AppAtividadesIdEditarRoute,
+  AppContatosIdEditarRoute: AppContatosIdEditarRoute,
+  AppEditaisIdEditarRoute: AppEditaisIdEditarRoute,
+  AppGruposIdEditarRoute: AppGruposIdEditarRoute,
+  AppProjetosIdEditarRoute: AppProjetosIdEditarRoute,
+  AppAtendimentosIdIndexRoute: AppAtendimentosIdIndexRoute,
+  AppAtividadesIdIndexRoute: AppAtividadesIdIndexRoute,
+  AppContatosIdIndexRoute: AppContatosIdIndexRoute,
+  AppEditaisIdIndexRoute: AppEditaisIdIndexRoute,
+  AppGruposIdIndexRoute: AppGruposIdIndexRoute,
+  AppProjetosIdIndexRoute: AppProjetosIdIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
