@@ -284,6 +284,17 @@ function ListaAtendidos() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem asChild><Link to="/atendidos/$id" params={{ id: r.id }}>Ver ficha</Link></DropdownMenuItem>
                         {canEdit && <DropdownMenuItem asChild><Link to="/atendidos/$id/editar" params={{ id: r.id }}>Editar</Link></DropdownMenuItem>}
+                        {isAdmin && (
+                          <>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              className="text-destructive focus:text-destructive"
+                              onClick={() => excluirIndividual(r.id, r.nome)}
+                            >
+                              <Trash2 className="w-4 h-4 mr-2" /> Excluir
+                            </DropdownMenuItem>
+                          </>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </td>
