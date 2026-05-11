@@ -1,7 +1,7 @@
 import { Link, useRouterState, useNavigate, Outlet } from "@tanstack/react-router";
 import {
   LayoutDashboard, FileText, FolderKanban, CalendarRange, HeartHandshake,
-  Users, Contact, BarChart3, Settings, LogOut, Search, Plus, Menu, X, MoreHorizontal,
+  Users, Contact, BarChart3, Settings, LogOut, Search, Plus, Menu, X, MoreHorizontal, UserCheck,
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
@@ -17,6 +17,7 @@ const NAV = [
   { to: "/editais", label: "Editais", icon: FileText },
   { to: "/projetos", label: "Projetos", icon: FolderKanban },
   { to: "/atividades", label: "Atividades", icon: CalendarRange },
+  { to: "/atendidos", label: "Atendidos", icon: UserCheck },
   { to: "/atendimentos", label: "Atendimentos", icon: HeartHandshake },
   { to: "/grupos", label: "Grupos / Turmas", icon: Users },
   { to: "/contatos", label: "Contatos", icon: Contact },
