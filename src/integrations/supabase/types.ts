@@ -163,6 +163,7 @@ export type Database = {
           genero: string | null
           id: string
           id_externo: string | null
+          idade_importada: number | null
           matricula: string
           matricula_familia: string | null
           mobilidade_reduzida: boolean | null
@@ -207,6 +208,7 @@ export type Database = {
           genero?: string | null
           id?: string
           id_externo?: string | null
+          idade_importada?: number | null
           matricula?: string
           matricula_familia?: string | null
           mobilidade_reduzida?: boolean | null
@@ -251,6 +253,7 @@ export type Database = {
           genero?: string | null
           id?: string
           id_externo?: string | null
+          idade_importada?: number | null
           matricula?: string
           matricula_familia?: string | null
           mobilidade_reduzida?: boolean | null
