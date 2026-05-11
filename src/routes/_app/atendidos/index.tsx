@@ -9,7 +9,7 @@ import {
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, FileDown, Filter, Eye, EyeOff, Search, MoreVertical, Tag, Users as UsersIcon, Upload } from "lucide-react";
+import { Plus, FileDown, Filter, Eye, EyeOff, Search, MoreVertical, Tag, Users as UsersIcon, Upload, Trash2 } from "lucide-react";
 import { ATENDIDO_STATUS, calcularIdade, hideCPF, maskCPF, statusClass, statusLabel, MARCADORES_PADRAO } from "@/lib/atendidos";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
@@ -34,7 +34,8 @@ const COLUNAS = [
 ];
 
 function ListaAtendidos() {
-  const { canEdit } = useAuth();
+  const { canEdit, hasRole } = useAuth();
+  const isAdmin = hasRole("administrador");
   const [rows, setRows] = useState<any[]>([]);
   const [marcadoresMap, setMarcadoresMap] = useState<Record<string, string[]>>({});
   const [vincMap, setVincMap] = useState<Record<string, { projeto?: string; grupo?: string }>>({});
@@ -118,6 +119,28 @@ function ListaAtendidos() {
     const inserts = Array.from(sel).map((atendido_id) => ({ atendido_id, grupo_id: id, status: "ativo", data_entrada: new Date().toISOString().slice(0, 10) }));
     const { error } = await supabase.from("atendido_projetos").insert(inserts);
     if (error) toast.error(error.message); else { toast.success("Adicionados ao grupo."); load(); setSel(new Set()); }
+  }
+  async function excluirSelecionados() {
+    if (!isAdmin) return;
+    const ids = Array.from(sel);
+    if (!ids.length) return;
+    if (!confirm(`Excluir definitivamente ${ids.length} atendido${ids.length > 1 ? "s" : ""}? Esta ação não pode ser desfeita.`)) return;
+    await supabase.from("atendido_marcadores").delete().in("atendido_id", ids);
+    await supabase.from("atendido_projetos").delete().in("atendido_id", ids);
+    await supabase.from("atendido_documentos").delete().in("atendido_id", ids);
+    const { error } = await supabase.from("atendidos").delete().in("id", ids);
+    if (error) toast.error(error.message);
+    else { toast.success("Atendidos excluídos."); setSel(new Set()); load(); }
+  }
+  async function excluirIndividual(id: string, nome: string) {
+    if (!isAdmin) return;
+    if (!confirm(`Excluir definitivamente "${nome}"? Esta ação não pode ser desfeita.`)) return;
+    await supabase.from("atendido_marcadores").delete().eq("atendido_id", id);
+    await supabase.from("atendido_projetos").delete().eq("atendido_id", id);
+    await supabase.from("atendido_documentos").delete().eq("atendido_id", id);
+    const { error } = await supabase.from("atendidos").delete().eq("id", id);
+    if (error) toast.error(error.message);
+    else { toast.success("Atendido excluído."); load(); }
   }
 
   function exportCSV() {
@@ -203,6 +226,11 @@ function ListaAtendidos() {
           <div className="flex gap-2">
             <Button size="sm" variant="outline" onClick={aplicarMarcadorMassa}><Tag className="w-4 h-4 mr-1" /> Aplicar marcador</Button>
             <Button size="sm" variant="outline" onClick={adicionarAGrupoMassa}><UsersIcon className="w-4 h-4 mr-1" /> Adicionar a grupo</Button>
+            {isAdmin && (
+              <Button size="sm" variant="destructive" onClick={excluirSelecionados}>
+                <Trash2 className="w-4 h-4 mr-1" /> Excluir selecionados
+              </Button>
+            )}
           </div>
         </div>
       )}
@@ -256,6 +284,17 @@ function ListaAtendidos() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem asChild><Link to="/atendidos/$id" params={{ id: r.id }}>Ver ficha</Link></DropdownMenuItem>
                         {canEdit && <DropdownMenuItem asChild><Link to="/atendidos/$id/editar" params={{ id: r.id }}>Editar</Link></DropdownMenuItem>}
+                        {isAdmin && (
+                          <>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              className="text-destructive focus:text-destructive"
+                              onClick={() => excluirIndividual(r.id, r.nome)}
+                            >
+                              <Trash2 className="w-4 h-4 mr-2" /> Excluir
+                            </DropdownMenuItem>
+                          </>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </td>
