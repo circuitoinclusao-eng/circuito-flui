@@ -158,8 +158,11 @@ export type Database = {
           email: string | null
           encaminhamento: string | null
           endereco: string | null
+          escolaridade: string | null
           foto_url: string | null
+          genero: string | null
           id: string
+          id_externo: string | null
           matricula: string
           matricula_familia: string | null
           mobilidade_reduzida: boolean | null
@@ -199,8 +202,11 @@ export type Database = {
           email?: string | null
           encaminhamento?: string | null
           endereco?: string | null
+          escolaridade?: string | null
           foto_url?: string | null
+          genero?: string | null
           id?: string
+          id_externo?: string | null
           matricula?: string
           matricula_familia?: string | null
           mobilidade_reduzida?: boolean | null
@@ -240,8 +246,11 @@ export type Database = {
           email?: string | null
           encaminhamento?: string | null
           endereco?: string | null
+          escolaridade?: string | null
           foto_url?: string | null
+          genero?: string | null
           id?: string
+          id_externo?: string | null
           matricula?: string
           matricula_familia?: string | null
           mobilidade_reduzida?: boolean | null

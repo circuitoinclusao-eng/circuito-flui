@@ -9,10 +9,11 @@ import {
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, FileDown, Filter, Eye, EyeOff, Search, MoreVertical, Tag, Users as UsersIcon } from "lucide-react";
+import { Plus, FileDown, Filter, Eye, EyeOff, Search, MoreVertical, Tag, Users as UsersIcon, Upload } from "lucide-react";
 import { ATENDIDO_STATUS, calcularIdade, hideCPF, maskCPF, statusClass, statusLabel, MARCADORES_PADRAO } from "@/lib/atendidos";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
+import { ImportarAtendidosDialog } from "@/components/atendidos/ImportarAtendidosDialog";
 
 export const Route = createFileRoute("/_app/atendidos/")({ component: ListaAtendidos });
 
@@ -45,6 +46,7 @@ function ListaAtendidos() {
   const [cols, setCols] = useState<string[]>(["foto", "nome", "status", "matricula_familia", "idade", "cpf", "telefone", "cidade", "projeto"]);
   const [projetos, setProjetos] = useState<any[]>([]);
   const [grupos, setGrupos] = useState<any[]>([]);
+  const [importOpen, setImportOpen] = useState(false);
 
   async function load() {
     const { data } = await supabase.from("atendidos").select("*").order("nome");
@@ -137,23 +139,8 @@ function ListaAtendidos() {
     URL.revokeObjectURL(u);
   }
 
-  async function importCSV(e: React.ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0]; if (!f) return;
-    const text = await f.text();
-    const [head, ...lines] = text.split(/\r?\n/).filter(Boolean);
-    const headers = head.split(",").map((h) => h.replace(/^"|"$/g, "").trim());
-    const objs = lines.map((ln) => {
-      const cols = ln.match(/("([^"]|"")*"|[^,]+)/g) ?? [];
-      const o: any = {};
-      headers.forEach((h, i) => { o[h] = (cols[i] ?? "").replace(/^"|"$/g, "").replace(/""/g, '"') || null; });
-      delete o.idade; delete o.projeto; delete o.grupo; delete o.matricula;
-      return o;
-    });
-    if (!objs.length) return;
-    const { error } = await supabase.from("atendidos").insert(objs);
-    if (error) toast.error(error.message); else { toast.success(`${objs.length} importados.`); load(); }
-    e.target.value = "";
-  }
+
+
 
   return (
     <>
@@ -164,10 +151,9 @@ function ListaAtendidos() {
           {canEdit && <Button asChild><Link to="/atendidos/novo"><Plus className="w-4 h-4 mr-1" /> Novo Atendido</Link></Button>}
           <Button variant="outline" onClick={exportCSV}><FileDown className="w-4 h-4 mr-1" /> Exportar</Button>
           {canEdit && (
-            <label className="inline-flex items-center px-3 h-9 text-sm border rounded-md cursor-pointer hover:bg-accent">
-              Importar CSV
-              <input type="file" accept=".csv" className="hidden" onChange={importCSV} />
-            </label>
+            <Button variant="outline" onClick={() => setImportOpen(true)}>
+              <Upload className="w-4 h-4 mr-1" /> Importar planilha
+            </Button>
           )}
         </div>
       </div>
@@ -301,6 +287,7 @@ function ListaAtendidos() {
           </div>
         ))}
       </div>
+      <ImportarAtendidosDialog open={importOpen} onClose={() => setImportOpen(false)} onDone={load} />
     </>
   );
 }
