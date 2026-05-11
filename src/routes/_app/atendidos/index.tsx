@@ -143,6 +143,7 @@ function ListaAtendidos() {
     else { toast.success("Atendido excluído."); load(); }
   }
 
+  function exportCSV() {
     const headers = ["matricula", "nome", "status", "data_nascimento", "idade", "cpf", "telefone", "cidade", "responsavel_nome", "projeto", "grupo"];
     const lines = [headers.join(",")];
     filtered.forEach((r) => {
