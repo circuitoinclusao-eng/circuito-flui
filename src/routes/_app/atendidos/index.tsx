@@ -139,23 +139,8 @@ function ListaAtendidos() {
     URL.revokeObjectURL(u);
   }
 
-  async function importCSV(e: React.ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0]; if (!f) return;
-    const text = await f.text();
-    const [head, ...lines] = text.split(/\r?\n/).filter(Boolean);
-    const headers = head.split(",").map((h) => h.replace(/^"|"$/g, "").trim());
-    const objs = lines.map((ln) => {
-      const cols = ln.match(/("([^"]|"")*"|[^,]+)/g) ?? [];
-      const o: any = {};
-      headers.forEach((h, i) => { o[h] = (cols[i] ?? "").replace(/^"|"$/g, "").replace(/""/g, '"') || null; });
-      delete o.idade; delete o.projeto; delete o.grupo; delete o.matricula;
-      return o;
-    });
-    if (!objs.length) return;
-    const { error } = await supabase.from("atendidos").insert(objs);
-    if (error) toast.error(error.message); else { toast.success(`${objs.length} importados.`); load(); }
-    e.target.value = "";
-  }
+
+
 
   return (
     <>
