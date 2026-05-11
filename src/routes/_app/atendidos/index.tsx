@@ -13,6 +13,7 @@ import { Plus, FileDown, Filter, Eye, EyeOff, Search, MoreVertical, Tag, Users a
 import { ATENDIDO_STATUS, calcularIdade, hideCPF, maskCPF, statusClass, statusLabel, MARCADORES_PADRAO } from "@/lib/atendidos";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
+import { ImportarAtendidosDialog } from "@/components/atendidos/ImportarAtendidosDialog";
 
 export const Route = createFileRoute("/_app/atendidos/")({ component: ListaAtendidos });
 
