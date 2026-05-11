@@ -14,6 +14,261 @@ export type Database = {
   }
   public: {
     Tables: {
+      atendido_documentos: {
+        Row: {
+          atendido_id: string
+          created_at: string
+          id: string
+          nome: string
+          tipo: string | null
+          url: string
+        }
+        Insert: {
+          atendido_id: string
+          created_at?: string
+          id?: string
+          nome: string
+          tipo?: string | null
+          url: string
+        }
+        Update: {
+          atendido_id?: string
+          created_at?: string
+          id?: string
+          nome?: string
+          tipo?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "atendido_documentos_atendido_id_fkey"
+            columns: ["atendido_id"]
+            isOneToOne: false
+            referencedRelation: "atendidos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      atendido_marcadores: {
+        Row: {
+          atendido_id: string
+          created_at: string
+          id: string
+          marcador: string
+        }
+        Insert: {
+          atendido_id: string
+          created_at?: string
+          id?: string
+          marcador: string
+        }
+        Update: {
+          atendido_id?: string
+          created_at?: string
+          id?: string
+          marcador?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "atendido_marcadores_atendido_id_fkey"
+            columns: ["atendido_id"]
+            isOneToOne: false
+            referencedRelation: "atendidos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      atendido_projetos: {
+        Row: {
+          atendido_id: string
+          atividade_id: string | null
+          created_at: string
+          data_entrada: string | null
+          grupo_id: string | null
+          id: string
+          projeto_id: string | null
+          responsavel_id: string | null
+          status: string | null
+        }
+        Insert: {
+          atendido_id: string
+          atividade_id?: string | null
+          created_at?: string
+          data_entrada?: string | null
+          grupo_id?: string | null
+          id?: string
+          projeto_id?: string | null
+          responsavel_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          atendido_id?: string
+          atividade_id?: string | null
+          created_at?: string
+          data_entrada?: string | null
+          grupo_id?: string | null
+          id?: string
+          projeto_id?: string | null
+          responsavel_id?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "atendido_projetos_atendido_id_fkey"
+            columns: ["atendido_id"]
+            isOneToOne: false
+            referencedRelation: "atendidos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "atendido_projetos_atividade_id_fkey"
+            columns: ["atividade_id"]
+            isOneToOne: false
+            referencedRelation: "atividades"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "atendido_projetos_grupo_id_fkey"
+            columns: ["grupo_id"]
+            isOneToOne: false
+            referencedRelation: "grupos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "atendido_projetos_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "projetos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      atendidos: {
+        Row: {
+          aceite_participacao: boolean | null
+          autorizacao_imagem: boolean | null
+          bairro: string | null
+          cep: string | null
+          cidade: string | null
+          comunicacao_alternativa: boolean | null
+          cpf: string | null
+          created_at: string
+          data_nascimento: string | null
+          demanda_inicial: string | null
+          email: string | null
+          encaminhamento: string | null
+          endereco: string | null
+          foto_url: string | null
+          id: string
+          matricula: string
+          matricula_familia: string | null
+          mobilidade_reduzida: boolean | null
+          necessidade_apoio: string | null
+          nome: string
+          numero_pessoas_familia: number | null
+          observacoes: string | null
+          observacoes_acessibilidade: string | null
+          observacoes_familiares: string | null
+          observacoes_legais: string | null
+          pessoa_com_deficiencia: string | null
+          proximo_retorno: string | null
+          responsavel_email: string | null
+          responsavel_nome: string | null
+          responsavel_parentesco: string | null
+          responsavel_telefone: string | null
+          restricao_saude: string | null
+          rg: string | null
+          status: string
+          telefone: string | null
+          tipo_deficiencia: string | null
+          updated_at: string
+          usa_cadeira_rodas: boolean | null
+          whatsapp: string | null
+        }
+        Insert: {
+          aceite_participacao?: boolean | null
+          autorizacao_imagem?: boolean | null
+          bairro?: string | null
+          cep?: string | null
+          cidade?: string | null
+          comunicacao_alternativa?: boolean | null
+          cpf?: string | null
+          created_at?: string
+          data_nascimento?: string | null
+          demanda_inicial?: string | null
+          email?: string | null
+          encaminhamento?: string | null
+          endereco?: string | null
+          foto_url?: string | null
+          id?: string
+          matricula?: string
+          matricula_familia?: string | null
+          mobilidade_reduzida?: boolean | null
+          necessidade_apoio?: string | null
+          nome: string
+          numero_pessoas_familia?: number | null
+          observacoes?: string | null
+          observacoes_acessibilidade?: string | null
+          observacoes_familiares?: string | null
+          observacoes_legais?: string | null
+          pessoa_com_deficiencia?: string | null
+          proximo_retorno?: string | null
+          responsavel_email?: string | null
+          responsavel_nome?: string | null
+          responsavel_parentesco?: string | null
+          responsavel_telefone?: string | null
+          restricao_saude?: string | null
+          rg?: string | null
+          status?: string
+          telefone?: string | null
+          tipo_deficiencia?: string | null
+          updated_at?: string
+          usa_cadeira_rodas?: boolean | null
+          whatsapp?: string | null
+        }
+        Update: {
+          aceite_participacao?: boolean | null
+          autorizacao_imagem?: boolean | null
+          bairro?: string | null
+          cep?: string | null
+          cidade?: string | null
+          comunicacao_alternativa?: boolean | null
+          cpf?: string | null
+          created_at?: string
+          data_nascimento?: string | null
+          demanda_inicial?: string | null
+          email?: string | null
+          encaminhamento?: string | null
+          endereco?: string | null
+          foto_url?: string | null
+          id?: string
+          matricula?: string
+          matricula_familia?: string | null
+          mobilidade_reduzida?: boolean | null
+          necessidade_apoio?: string | null
+          nome?: string
+          numero_pessoas_familia?: number | null
+          observacoes?: string | null
+          observacoes_acessibilidade?: string | null
+          observacoes_familiares?: string | null
+          observacoes_legais?: string | null
+          pessoa_com_deficiencia?: string | null
+          proximo_retorno?: string | null
+          responsavel_email?: string | null
+          responsavel_nome?: string | null
+          responsavel_parentesco?: string | null
+          responsavel_telefone?: string | null
+          restricao_saude?: string | null
+          rg?: string | null
+          status?: string
+          telefone?: string | null
+          tipo_deficiencia?: string | null
+          updated_at?: string
+          usa_cadeira_rodas?: boolean | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
       atendimentos: {
         Row: {
           contato_id: string | null
@@ -389,6 +644,50 @@ export type Database = {
             columns: ["projeto_id"]
             isOneToOne: false
             referencedRelation: "projetos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      historico_atendimentos: {
+        Row: {
+          atendido_id: string
+          created_at: string
+          data: string
+          demanda: string | null
+          encaminhamento: string | null
+          id: string
+          observacoes: string | null
+          responsavel_id: string | null
+          tipo: string | null
+        }
+        Insert: {
+          atendido_id: string
+          created_at?: string
+          data?: string
+          demanda?: string | null
+          encaminhamento?: string | null
+          id?: string
+          observacoes?: string | null
+          responsavel_id?: string | null
+          tipo?: string | null
+        }
+        Update: {
+          atendido_id?: string
+          created_at?: string
+          data?: string
+          demanda?: string | null
+          encaminhamento?: string | null
+          id?: string
+          observacoes?: string | null
+          responsavel_id?: string | null
+          tipo?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "historico_atendimentos_atendido_id_fkey"
+            columns: ["atendido_id"]
+            isOneToOne: false
+            referencedRelation: "atendidos"
             referencedColumns: ["id"]
           },
         ]
