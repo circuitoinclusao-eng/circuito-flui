@@ -64,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const hasRole = (r: Role) => roles.includes(r);
   const isAdminOrCoord = roles.some((r) => r === "administrador" || r === "coordenador");
-  const canEdit = roles.some((r) => r === "administrador" || r === "coordenador" || r === "colaborador");
+  const canEdit = roles.some((r) => r === "administrador" || r === "coordenador" || r === "colaborador" || r === "professor");
 
   return (
     <Ctx.Provider
