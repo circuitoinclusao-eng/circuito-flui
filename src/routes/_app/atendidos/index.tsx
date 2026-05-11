@@ -305,7 +305,7 @@ function ListaAtendidos() {
   );
 }
 
-function FilterSelect({ label, value, onChange, options }: any) {
+function FilterSelect({ label, value, onChange, options }: { label: string; value: any; onChange: (v: string | null) => void; options: ReadonlyArray<{ value: string; label: string }> }) {
   return (
     <div>
       <div className="text-xs text-muted-foreground mb-1">{label}</div>
