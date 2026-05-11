@@ -4,7 +4,6 @@ import {
 } from "@tanstack/react-router";
 import { AuthProvider } from "@/lib/auth";
 import { Toaster } from "@/components/ui/sonner";
-import { InstallPrompt } from "@/components/InstallPrompt";
 
 import appCss from "../styles.css?url";
 
@@ -55,26 +54,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Gestor Circuito Inclusão" },
       { name: "description", content: "Sistema gratuito de gestão de projetos, atividades, atendimentos e relatórios do Circuito Inclusão." },
       { name: "author", content: "Circuito Inclusão" },
-      { name: "theme-color", content: "#1e40af" },
-      { name: "apple-mobile-web-app-capable", content: "yes" },
-      { name: "apple-mobile-web-app-status-bar-style", content: "default" },
-      { name: "apple-mobile-web-app-title", content: "Gestor Circuito" },
-      { name: "mobile-web-app-capable", content: "yes" },
       { property: "og:title", content: "Gestor Circuito Inclusão" },
-      { property: "og:description", content: "Gestão de projetos sociais, atividades mensais, atendimentos e prestação de contas." },
+      { property: "og:description", content: "Sistema gratuito de gestão de projetos, atividades, atendimentos e relatórios do Circuito Inclusão." },
       { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "Gestor Circuito Inclusão" },
+      { name: "twitter:description", content: "Sistema gratuito de gestão de projetos, atividades, atendimentos e relatórios do Circuito Inclusão." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/78714879-8cc8-4be9-bd19-48a29496e3da/id-preview-730dd65a--d5752348-182b-4658-8bd4-5c5e8f4be294.lovable.app-1778521115822.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/78714879-8cc8-4be9-bd19-48a29496e3da/id-preview-730dd65a--d5752348-182b-4658-8bd4-5c5e8f4be294.lovable.app-1778521115822.png" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [
-      { rel: "stylesheet", href: appCss },
-      { rel: "manifest", href: "/manifest.webmanifest" },
-      { rel: "icon", type: "image/png", sizes: "192x192", href: "/icon-192.png" },
-      { rel: "icon", type: "image/png", sizes: "512x512", href: "/icon-512.png" },
-      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
-    ],
+    links: [{ rel: "stylesheet", href: appCss }],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -100,7 +93,6 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <Outlet />
-        <InstallPrompt />
         <Toaster richColors position="top-right" />
       </AuthProvider>
     </QueryClientProvider>
