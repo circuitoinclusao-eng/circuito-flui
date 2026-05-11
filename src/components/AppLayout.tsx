@@ -97,6 +97,7 @@ export function AppLayout() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => nav({ to: "/atendidos/novo" })}>Atendido</DropdownMenuItem>
               <DropdownMenuItem onClick={() => nav({ to: "/projetos/novo" })}>Projeto</DropdownMenuItem>
               <DropdownMenuItem onClick={() => nav({ to: "/atividades/novo" })}>Atividade</DropdownMenuItem>
               <DropdownMenuItem onClick={() => nav({ to: "/atendimentos/novo" })}>Atendimento</DropdownMenuItem>
