@@ -226,6 +226,11 @@ function ListaAtendidos() {
           <div className="flex gap-2">
             <Button size="sm" variant="outline" onClick={aplicarMarcadorMassa}><Tag className="w-4 h-4 mr-1" /> Aplicar marcador</Button>
             <Button size="sm" variant="outline" onClick={adicionarAGrupoMassa}><UsersIcon className="w-4 h-4 mr-1" /> Adicionar a grupo</Button>
+            {isAdmin && (
+              <Button size="sm" variant="destructive" onClick={excluirSelecionados}>
+                <Trash2 className="w-4 h-4 mr-1" /> Excluir selecionados
+              </Button>
+            )}
           </div>
         </div>
       )}
