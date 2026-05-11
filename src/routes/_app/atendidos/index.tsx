@@ -287,6 +287,7 @@ function ListaAtendidos() {
           </div>
         ))}
       </div>
+      <ImportarAtendidosDialog open={importOpen} onClose={() => setImportOpen(false)} onDone={load} />
     </>
   );
 }
