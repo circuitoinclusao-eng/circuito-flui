@@ -1,189 +1,334 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader } from "@/components/AppLayout";
 import { StatCard, SectionCard, StatusBadge } from "@/components/Cards";
 import {
-  FolderKanban, Users, CalendarRange, FileText, HeartHandshake,
-  AlertCircle, TrendingUp, ListChecks,
+  FolderKanban, Users, CalendarRange, ClipboardCheck,
+  AlertCircle, FileWarning, Clock, Cake, MapPin,
 } from "lucide-react";
-import { Link } from "@tanstack/react-router";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
-  PieChart, Pie, Cell, Legend,
 } from "recharts";
 
 export const Route = createFileRoute("/_app/inicio")({
   component: Dashboard,
 });
 
+function startOfWeek(d = new Date()) {
+  const x = new Date(d);
+  const day = x.getDay();
+  x.setDate(x.getDate() - day);
+  x.setHours(0, 0, 0, 0);
+  return x;
+}
+function endOfWeek(d = new Date()) {
+  const x = startOfWeek(d);
+  x.setDate(x.getDate() + 7);
+  return x;
+}
+function iso(d: Date) { return d.toISOString().slice(0, 10); }
+
 function Dashboard() {
+  const hoje = new Date();
+  const semIni = iso(startOfWeek(hoje));
+  const semFim = iso(endOfWeek(hoje));
+  const mesAtual = hoje.getMonth() + 1;
+  const em30 = new Date(); em30.setDate(em30.getDate() + 30);
+
   const [stats, setStats] = useState({
-    projetos: 0, atendidos: 0, atividades: 0, grupos: 0,
-    editaisAbertos: 0, atendMes: 0, pendentes: 0, emExecucao: 0,
+    atividadesSemana: 0,
+    chamadasPendentes: 0,
+    participantesAtivos: 0,
+    projetosAtivos: 0,
   });
-  const [recent, setRecent] = useState<any[]>([]);
-  const [editais, setEditais] = useState<any[]>([]);
-  const [chartMes, setChartMes] = useState<any[]>([]);
-  const [chartStatus, setChartStatus] = useState<any[]>([]);
+  const [encontrosSemana, setEncontrosSemana] = useState<any[]>([]);
+  const [chamadasPend, setChamadasPend] = useState<any[]>([]);
+  const [docsPend, setDocsPend] = useState<any[]>([]);
+  const [topFaltosos, setTopFaltosos] = useState<any[]>([]);
+  const [projFim, setProjFim] = useState<any[]>([]);
+  const [aniversariantes, setAniversariantes] = useState<any[]>([]);
+  const [presencaMes, setPresencaMes] = useState<any[]>([]);
+  const [porCidade, setPorCidade] = useState<any[]>([]);
+  const [porModalidade, setPorModalidade] = useState<any[]>([]);
 
   useEffect(() => { load(); }, []);
 
   async function load() {
-    const now = new Date();
-    const mesIni = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-
     const [
-      proj, ativ, grup, ed, atendMes, pend, emEx, atividadesAll, projetosStatus, recentAt, edAbertos,
+      semana, pend, ativAtivos, projAtivos, docs, projFinal, aniv, faltasRows, cidadeRows, modRows, presMes,
     ] = await Promise.all([
-      supabase.from("projetos").select("*", { count: "exact", head: true }),
-      supabase.from("atividades").select("participantes_atendidos"),
-      supabase.from("grupos").select("*", { count: "exact", head: true }),
-      supabase.from("editais").select("*", { count: "exact", head: true }).eq("status", "aberto"),
-      supabase.from("atendimentos").select("*", { count: "exact", head: true }).gte("data", mesIni.slice(0, 10)),
-      supabase.from("fechamentos_mensais").select("*", { count: "exact", head: true }).eq("situacao", "aberto"),
-      supabase.from("projetos").select("*", { count: "exact", head: true }).eq("status", "em_execucao"),
-      supabase.from("atividades").select("data"),
-      supabase.from("projetos").select("status"),
-      supabase.from("atividades").select("id,titulo,data,status,projetos(titulo)").order("created_at", { ascending: false }).limit(5),
-      supabase.from("editais").select("id,titulo,data_fim,status").eq("status", "aberto").order("data_fim").limit(5),
+      supabase.from("encontros_atividade")
+        .select("id,data,horario_inicio,status,atividade_id,atividades(titulo,tipo,local)")
+        .gte("data", semIni).lt("data", semFim).order("data"),
+      supabase.from("encontros_atividade")
+        .select("id,data,atividade_id,atividades(titulo)")
+        .eq("status", "nao_registrada").lt("data", iso(hoje)).order("data", { ascending: false }).limit(8),
+      supabase.from("atendidos").select("*", { count: "exact", head: true }).eq("status", "ativo"),
+      supabase.from("projetos").select("*", { count: "exact", head: true }).in("status", ["em_execucao", "aprovado"]),
+      supabase.from("projetos")
+        .select("id,titulo,data_fim,situacao_prestacao_contas")
+        .in("situacao_prestacao_contas", ["em_elaboracao", "com_pendencia"]).limit(5),
+      supabase.from("projetos")
+        .select("id,titulo,data_fim,status")
+        .in("status", ["em_execucao", "aprovado"])
+        .gte("data_fim", iso(hoje)).lte("data_fim", iso(em30)).order("data_fim").limit(6),
+      supabase.from("atendidos").select("id,nome,data_nascimento").not("data_nascimento", "is", null),
+      supabase.from("presencas_atividade")
+        .select("atendido_id,presente,atendidos(nome)")
+        .eq("presente", false).limit(2000),
+      supabase.from("atendidos").select("cidade").eq("status", "ativo"),
+      supabase.from("atividades").select("tipo"),
+      supabase.from("encontros_atividade")
+        .select("data,numero_presentes")
+        .gte("data", iso(new Date(hoje.getFullYear(), hoje.getMonth() - 5, 1))),
     ]);
 
-    const totalAtendidos = (ativ.data ?? []).reduce((s: number, r: any) => s + (r.participantes_atendidos ?? 0), 0);
+    setEncontrosSemana(semana.data ?? []);
+    setChamadasPend(pend.data ?? []);
+    setDocsPend(docs.data ?? []);
+    setProjFim(projFinal.data ?? []);
 
     setStats({
-      projetos: proj.count ?? 0,
-      atendidos: totalAtendidos,
-      atividades: ativ.data?.length ?? 0,
-      grupos: grup.count ?? 0,
-      editaisAbertos: ed.count ?? 0,
-      atendMes: atendMes.count ?? 0,
-      pendentes: pend.count ?? 0,
-      emExecucao: emEx.count ?? 0,
+      atividadesSemana: (semana.data ?? []).length,
+      chamadasPendentes: (pend.data ?? []).length,
+      participantesAtivos: ativAtivos.count ?? 0,
+      projetosAtivos: projAtivos.count ?? 0,
     });
 
-    // chart por mês (últimos 6)
-    const counts: Record<string, number> = {};
+    // Aniversariantes do mês
+    const ans = (aniv.data ?? []).filter((p: any) => {
+      const d = new Date(p.data_nascimento);
+      return d.getMonth() + 1 === mesAtual;
+    }).sort((a: any, b: any) => new Date(a.data_nascimento).getDate() - new Date(b.data_nascimento).getDate());
+    setAniversariantes(ans.slice(0, 10));
+
+    // Top faltosos
+    const counts: Record<string, { nome: string; n: number }> = {};
+    (faltasRows.data ?? []).forEach((r: any) => {
+      const id = r.atendido_id;
+      if (!counts[id]) counts[id] = { nome: r.atendidos?.nome ?? "—", n: 0 };
+      counts[id].n++;
+    });
+    setTopFaltosos(Object.entries(counts).map(([id, v]) => ({ id, ...v })).sort((a, b) => b.n - a.n).slice(0, 6));
+
+    // Por cidade
+    const cMap: Record<string, number> = {};
+    (cidadeRows.data ?? []).forEach((r: any) => {
+      const c = r.cidade || "Não informado";
+      cMap[c] = (cMap[c] ?? 0) + 1;
+    });
+    setPorCidade(Object.entries(cMap).map(([cidade, total]) => ({ cidade, total })).sort((a, b) => b.total - a.total).slice(0, 6));
+
+    // Por modalidade
+    const mMap: Record<string, number> = {};
+    (modRows.data ?? []).forEach((r: any) => {
+      const t = r.tipo || "Não informado";
+      mMap[t] = (mMap[t] ?? 0) + 1;
+    });
+    setPorModalidade(Object.entries(mMap).map(([modalidade, total]) => ({ modalidade, total })).sort((a, b) => b.total - a.total).slice(0, 8));
+
+    // Presença últimos 6 meses
+    const pm: Record<string, number> = {};
     for (let i = 5; i >= 0; i--) {
-      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const k = d.toLocaleDateString("pt-BR", { month: "short" });
-      counts[k] = 0;
+      const d = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+      pm[d.toLocaleDateString("pt-BR", { month: "short" })] = 0;
     }
-    (atividadesAll.data ?? []).forEach((a: any) => {
-      if (!a.data) return;
-      const d = new Date(a.data);
+    (presMes.data ?? []).forEach((r: any) => {
+      if (!r.data) return;
+      const d = new Date(r.data);
       const k = d.toLocaleDateString("pt-BR", { month: "short" });
-      if (k in counts) counts[k]++;
+      if (k in pm) pm[k] += r.numero_presentes ?? 0;
     });
-    setChartMes(Object.entries(counts).map(([mes, total]) => ({ mes, total })));
-
-    const sc: Record<string, number> = {};
-    (projetosStatus.data ?? []).forEach((p: any) => { sc[p.status] = (sc[p.status] ?? 0) + 1; });
-    setChartStatus(Object.entries(sc).map(([name, value]) => ({ name, value })));
-
-    setRecent(recentAt.data ?? []);
-    setEditais(edAbertos.data ?? []);
+    setPresencaMes(Object.entries(pm).map(([mes, presencas]) => ({ mes, presencas })));
   }
 
-  const COLORS = ["oklch(0.5 0.18 255)", "oklch(0.55 0.16 295)", "oklch(0.72 0.16 75)", "oklch(0.62 0.13 200)", "oklch(0.65 0.16 155)", "oklch(0.6 0.22 27)"];
+  const dias = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
   return (
     <>
       <PageHeader breadcrumb={["Início"]} title="Painel geral" />
 
+      {/* KPIs prioritários */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
-        <StatCard label="Projetos" value={stats.projetos} icon={FolderKanban} to="/projetos" variant="blue" />
-        <StatCard label="Pessoas atendidas" value={stats.atendidos} icon={Users} variant="lilac" />
-        <StatCard label="Atividades" value={stats.atividades} icon={CalendarRange} to="/atividades" variant="teal" />
-        <StatCard label="Grupos / turmas" value={stats.grupos} icon={Users} to="/grupos" variant="amber" />
-        <StatCard label="Editais abertos" value={stats.editaisAbertos} icon={FileText} to="/editais" variant="blue" />
-        <StatCard label="Atendimentos do mês" value={stats.atendMes} icon={HeartHandshake} to="/atendimentos" variant="teal" />
-        <StatCard label="Pendentes de fechamento" value={stats.pendentes} icon={AlertCircle} variant="amber" />
-        <StatCard label="Projetos em execução" value={stats.emExecucao} icon={TrendingUp} variant="lilac" />
+        <StatCard label="Atividades da semana" value={stats.atividadesSemana} icon={CalendarRange} to="/atividades" variant="blue" />
+        <StatCard label="Chamadas pendentes" value={stats.chamadasPendentes} icon={ClipboardCheck} variant="amber" />
+        <StatCard label="Participantes ativos" value={stats.participantesAtivos} icon={Users} to="/atendidos" variant="lilac" />
+        <StatCard label="Projetos ativos" value={stats.projetosAtivos} icon={FolderKanban} to="/projetos" variant="teal" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+        {/* Coluna principal */}
         <div className="lg:col-span-2 space-y-4 md:space-y-6">
-          <SectionCard title="Atividades por mês">
-            <div className="h-64">
+          <SectionCard title="Atividades desta semana">
+            {encontrosSemana.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Nenhuma atividade marcada para esta semana.</p>
+            ) : (
+              <ul className="divide-y">
+                {encontrosSemana.map((e) => {
+                  const d = new Date(e.data);
+                  return (
+                    <li key={e.id} className="py-3 flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="bg-muted rounded-lg w-12 text-center py-1 shrink-0">
+                          <div className="text-[10px] uppercase text-muted-foreground">{dias[d.getDay()]}</div>
+                          <div className="font-bold">{d.getDate()}</div>
+                        </div>
+                        <div className="min-w-0">
+                          <Link to="/atividades/$id" params={{ id: e.atividade_id }} className="font-medium hover:text-primary truncate block">
+                            {e.atividades?.titulo}
+                          </Link>
+                          <div className="text-xs text-muted-foreground truncate">
+                            {e.atividades?.tipo ?? "—"} • {e.atividades?.local ?? "Sem local"} {e.horario_inicio ? `• ${e.horario_inicio.slice(0, 5)}` : ""}
+                          </div>
+                        </div>
+                      </div>
+                      <StatusBadge status={e.status} />
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </SectionCard>
+
+          <SectionCard title="Presença mensal (últimos 6 meses)">
+            <div className="h-56">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartMes}>
+                <BarChart data={presencaMes}>
                   <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.9 0.015 255)" />
                   <XAxis dataKey="mes" fontSize={12} />
                   <YAxis fontSize={12} allowDecimals={false} />
                   <Tooltip />
-                  <Bar dataKey="total" fill="oklch(0.5 0.18 255)" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="presencas" fill="oklch(0.5 0.18 255)" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </SectionCard>
 
-          <SectionCard title="Atividades recentes" action={<Link to="/atividades" className="text-xs text-primary hover:underline">Ver todas</Link>}>
-            {recent.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Nenhuma atividade ainda. <Link to="/atividades/novo" className="text-primary hover:underline">Cadastrar uma</Link>.</p>
-            ) : (
-              <ul className="divide-y">
-                {recent.map((a) => (
-                  <li key={a.id} className="py-3 flex items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <Link to="/atividades/$id" params={{ id: a.id }} className="font-medium hover:text-primary truncate block">
-                        {a.titulo}
-                      </Link>
-                      <div className="text-xs text-muted-foreground">
-                        {a.projetos?.titulo ?? "Sem projeto"} • {a.data ? new Date(a.data).toLocaleDateString("pt-BR") : "Sem data"}
-                      </div>
-                    </div>
-                    <StatusBadge status={a.status} />
-                  </li>
-                ))}
-              </ul>
-            )}
-          </SectionCard>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <SectionCard title="Participantes por cidade / polo">
+              {porCidade.length === 0 ? <p className="text-sm text-muted-foreground">Sem dados.</p> : (
+                <ul className="space-y-2">
+                  {porCidade.map((c) => (
+                    <li key={c.cidade} className="flex items-center justify-between text-sm">
+                      <span className="flex items-center gap-2"><MapPin className="w-3.5 h-3.5 text-muted-foreground" />{c.cidade}</span>
+                      <span className="font-semibold">{c.total}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </SectionCard>
+            <SectionCard title="Atividades por modalidade">
+              {porModalidade.length === 0 ? <p className="text-sm text-muted-foreground">Sem dados.</p> : (
+                <ul className="space-y-2">
+                  {porModalidade.map((m) => (
+                    <li key={m.modalidade} className="flex items-center justify-between text-sm">
+                      <span>{m.modalidade}</span>
+                      <span className="font-semibold">{m.total}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </SectionCard>
+          </div>
         </div>
 
+        {/* Coluna lateral - alertas */}
         <div className="space-y-4 md:space-y-6">
-          <SectionCard title="Projetos por status">
-            <div className="h-56">
-              {chartStatus.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Sem dados.</p>
-              ) : (
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie data={chartStatus} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} label={(e: any) => e.name}>
-                      {chartStatus.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-                    </Pie>
-                    <Legend wrapperStyle={{ fontSize: 11 }} />
-                  </PieChart>
-                </ResponsiveContainer>
-              )}
-            </div>
-          </SectionCard>
-
-          <SectionCard title="Editais abertos" action={<Link to="/editais" className="text-xs text-primary hover:underline">Ver todos</Link>}>
-            {editais.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Nenhum edital aberto.</p>
+          <SectionCard title="Chamadas pendentes" action={<AlertCircle className="w-4 h-4 text-warning" />}>
+            {chamadasPend.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Nenhuma chamada pendente. ✔</p>
             ) : (
-              <ul className="space-y-3">
-                {editais.map((e) => (
+              <ul className="space-y-2">
+                {chamadasPend.map((e) => (
                   <li key={e.id} className="text-sm">
-                    <div className="font-medium">{e.titulo}</div>
-                    <div className="text-xs text-muted-foreground">
-                      Encerra em: {e.data_fim ? new Date(e.data_fim).toLocaleDateString("pt-BR") : "—"}
-                    </div>
+                    <Link to="/atividades/$id" params={{ id: e.atividade_id }} className="font-medium hover:text-primary block truncate">
+                      {e.atividades?.titulo}
+                    </Link>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(e.data).toLocaleDateString("pt-BR")}
+                    </span>
                   </li>
                 ))}
               </ul>
             )}
           </SectionCard>
 
-          <SectionCard title="Pendências do mês">
-            <div className="flex items-center gap-3">
-              <ListChecks className="w-8 h-8 text-warning" />
-              <div>
-                <div className="text-2xl font-bold">{stats.pendentes}</div>
-                <div className="text-xs text-muted-foreground">Fechamentos abertos</div>
-              </div>
-            </div>
+          <SectionCard title="Projetos próximos do fim" action={<Clock className="w-4 h-4 text-warning" />}>
+            {projFim.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Nenhum projeto encerrando em 30 dias.</p>
+            ) : (
+              <ul className="space-y-2">
+                {projFim.map((p) => (
+                  <li key={p.id} className="text-sm">
+                    <Link to="/projetos/$id" params={{ id: p.id }} className="font-medium hover:text-primary block truncate">
+                      {p.titulo}
+                    </Link>
+                    <span className="text-xs text-muted-foreground">
+                      Encerra em {new Date(p.data_fim).toLocaleDateString("pt-BR")}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </SectionCard>
+
+          <SectionCard title="Documentos / prestação pendente" action={<FileWarning className="w-4 h-4 text-warning" />}>
+            {docsPend.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Sem pendências de prestação.</p>
+            ) : (
+              <ul className="space-y-2">
+                {docsPend.map((p) => (
+                  <li key={p.id} className="text-sm">
+                    <Link to="/projetos/$id" params={{ id: p.id }} className="font-medium hover:text-primary block truncate">
+                      {p.titulo}
+                    </Link>
+                    <span className="text-xs text-muted-foreground capitalize">
+                      {p.situacao_prestacao_contas?.replaceAll("_", " ")}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </SectionCard>
+
+          <SectionCard title="Participantes com mais faltas">
+            {topFaltosos.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Sem registros de falta.</p>
+            ) : (
+              <ul className="space-y-2">
+                {topFaltosos.map((f) => (
+                  <li key={f.id} className="flex items-center justify-between text-sm">
+                    <Link to="/atendidos/$id" params={{ id: f.id }} className="hover:text-primary truncate">
+                      {f.nome}
+                    </Link>
+                    <span className="font-semibold text-destructive">{f.n}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </SectionCard>
+
+          <SectionCard title="Aniversariantes do mês" action={<Cake className="w-4 h-4 text-primary" />}>
+            {aniversariantes.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Nenhum aniversariante este mês.</p>
+            ) : (
+              <ul className="space-y-2">
+                {aniversariantes.map((a) => {
+                  const d = new Date(a.data_nascimento);
+                  return (
+                    <li key={a.id} className="flex items-center justify-between text-sm">
+                      <Link to="/atendidos/$id" params={{ id: a.id }} className="hover:text-primary truncate">
+                        {a.nome}
+                      </Link>
+                      <span className="text-xs text-muted-foreground">
+                        {String(d.getDate()).padStart(2, "0")}/{String(d.getMonth() + 1).padStart(2, "0")}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </SectionCard>
         </div>
       </div>
