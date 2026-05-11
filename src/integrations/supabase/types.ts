@@ -1008,6 +1008,7 @@ export type Database = {
           id: string
           observacao: string | null
           presente: boolean
+          status: string
         }
         Insert: {
           atendido_id: string
@@ -1016,6 +1017,7 @@ export type Database = {
           id?: string
           observacao?: string | null
           presente?: boolean
+          status?: string
         }
         Update: {
           atendido_id?: string
@@ -1024,6 +1026,7 @@ export type Database = {
           id?: string
           observacao?: string | null
           presente?: boolean
+          status?: string
         }
         Relationships: []
       }

@@ -96,9 +96,12 @@ function AtividadeDetalhe() {
           )}
         </div>
         <div className="flex gap-2 flex-wrap">
+          <Button variant="outline" size="sm" asChild>
+            <Link to="/atividades/$id/relatorio" params={{ id }}><FileDown className="w-4 h-4 mr-1" /> Relatório completo</Link>
+          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm"><FileDown className="w-4 h-4 mr-1" /> Gerar arquivo</Button>
+              <Button variant="outline" size="sm"><FileDown className="w-4 h-4 mr-1" /> Exportar</Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={gerarRelInscritos}>Lista de inscritos (CSV)</DropdownMenuItem>
