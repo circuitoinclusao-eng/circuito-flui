@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth";
 import { PageHeader } from "@/components/AppLayout";
 import { StatCard, SectionCard, StatusBadge } from "@/components/Cards";
 import {
@@ -30,6 +31,8 @@ function endOfWeek(d = new Date()) {
 function iso(d: Date) { return d.toISOString().slice(0, 10); }
 
 function Dashboard() {
+  const { user, hasRole, isAdminOrCoord } = useAuth();
+  const isProfessorOnly = hasRole("professor") && !isAdminOrCoord;
   const hoje = new Date();
   const semIni = iso(startOfWeek(hoje));
   const semFim = iso(endOfWeek(hoje));
