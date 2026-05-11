@@ -1,7 +1,7 @@
 import { Link, useRouterState, useNavigate, Outlet } from "@tanstack/react-router";
 import {
   LayoutDashboard, FileText, FolderKanban, CalendarRange, HeartHandshake,
-  Users, Contact, BarChart3, Settings, LogOut, Search, Plus, Menu, X
+  Users, Contact, BarChart3, Settings, LogOut, Search, Plus, Menu, X, MoreHorizontal,
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
@@ -125,7 +125,7 @@ export function AppLayout() {
           </DropdownMenu>
         </header>
 
-        <main className="flex-1 p-4 md:p-6 lg:p-8 max-w-[1400px] w-full mx-auto">
+        <main className="flex-1 p-4 md:p-6 lg:p-8 max-w-[1400px] w-full mx-auto pb-24 md:pb-8">
           <Outlet />
         </main>
       </div>
@@ -133,6 +133,34 @@ export function AppLayout() {
       {open && (
         <div className="md:hidden fixed inset-0 bg-black/40 z-30" onClick={() => setOpen(false)} />
       )}
+
+      {/* Bottom nav (mobile) */}
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-card border-t border-border h-16 flex items-stretch justify-around pb-[env(safe-area-inset-bottom)]">
+        {[
+          { to: "/", label: "Início", icon: LayoutDashboard },
+          { to: "/projetos", label: "Projetos", icon: FolderKanban },
+          { to: "/atividades", label: "Atividades", icon: CalendarRange },
+          { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
+        ].map(({ to, label, icon: Icon }) => (
+          <Link
+            key={to}
+            to={to}
+            className={`flex-1 flex flex-col items-center justify-center gap-0.5 text-[11px] ${
+              isActive(to) ? "text-primary font-medium" : "text-muted-foreground"
+            }`}
+          >
+            <Icon className="w-5 h-5" />
+            {label}
+          </Link>
+        ))}
+        <button
+          onClick={() => setOpen(true)}
+          className="flex-1 flex flex-col items-center justify-center gap-0.5 text-[11px] text-muted-foreground"
+        >
+          <MoreHorizontal className="w-5 h-5" />
+          Mais
+        </button>
+      </nav>
     </div>
   );
 }
