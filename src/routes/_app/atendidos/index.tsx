@@ -34,7 +34,8 @@ const COLUNAS = [
 ];
 
 function ListaAtendidos() {
-  const { canEdit } = useAuth();
+  const { canEdit, hasRole } = useAuth();
+  const isAdmin = hasRole("administrador");
   const [rows, setRows] = useState<any[]>([]);
   const [marcadoresMap, setMarcadoresMap] = useState<Record<string, string[]>>({});
   const [vincMap, setVincMap] = useState<Record<string, { projeto?: string; grupo?: string }>>({});
