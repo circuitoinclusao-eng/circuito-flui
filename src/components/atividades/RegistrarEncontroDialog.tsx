@@ -26,7 +26,7 @@ interface Props {
 export function RegistrarEncontroDialog({ open, onClose, atividadeId, encontro, controlePresenca, reload }: Props) {
   const [v, setV] = useState<any>({});
   const [inscritos, setInscritos] = useState<any[]>([]);
-  const [presencas, setPresencas] = useState<Record<string, { presente: boolean; observacao: string }>>({});
+  const [presencas, setPresencas] = useState<Record<string, { status: PresencaStatus; observacao: string }>>({});
   const [fotos, setFotos] = useState<any[]>([]);
   const [busy, setBusy] = useState(false);
 
@@ -58,8 +58,11 @@ export function RegistrarEncontroDialog({ open, onClose, atividadeId, encontro, 
       supabase.from("atividade_fotos").select("*").eq("encontro_id", encId).order("ordem"),
     ]);
     setInscritos(ins ?? []);
-    const map: Record<string, { presente: boolean; observacao: string }> = {};
-    (pr ?? []).forEach((p: any) => { map[p.atendido_id] = { presente: p.presente, observacao: p.observacao ?? "" }; });
+    const map: Record<string, { status: PresencaStatus; observacao: string }> = {};
+    (pr ?? []).forEach((p: any) => {
+      const st: PresencaStatus = (p.status as PresencaStatus) ?? (p.presente ? "presente" : "falta");
+      map[p.atendido_id] = { status: st, observacao: p.observacao ?? "" };
+    });
     setPresencas(map);
     setFotos(fo ?? []);
   }
