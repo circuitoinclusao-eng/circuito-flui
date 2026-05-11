@@ -275,3 +275,30 @@ export function RegistrarEncontroDialog({ open, onClose, atividadeId, encontro, 
     </Dialog>
   );
 }
+
+function PresBtn({
+  active, variant, onClick, children,
+}: {
+  active: boolean;
+  variant: "presente" | "falta" | "justificada";
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  const styles = {
+    presente: active ? "bg-success text-success-foreground border-success" : "hover:bg-success/10 hover:text-success hover:border-success/40",
+    falta: active ? "bg-destructive text-destructive-foreground border-destructive" : "hover:bg-destructive/10 hover:text-destructive hover:border-destructive/40",
+    justificada: active ? "bg-warning text-warning-foreground border-warning" : "hover:bg-warning/10 hover:text-warning hover:border-warning/40",
+  };
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "inline-flex items-center justify-center h-9 px-2.5 rounded-md border text-xs font-medium transition-colors min-w-[40px]",
+        styles[variant]
+      )}
+    >
+      {children}
+    </button>
+  );
+}
