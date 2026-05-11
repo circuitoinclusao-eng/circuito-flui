@@ -322,54 +322,219 @@ export type Database = {
           },
         ]
       }
+      atividade_educadores: {
+        Row: {
+          atividade_id: string
+          created_at: string
+          id: string
+          usuario_id: string
+        }
+        Insert: {
+          atividade_id: string
+          created_at?: string
+          id?: string
+          usuario_id: string
+        }
+        Update: {
+          atividade_id?: string
+          created_at?: string
+          id?: string
+          usuario_id?: string
+        }
+        Relationships: []
+      }
+      atividade_fotos: {
+        Row: {
+          atividade_id: string
+          created_at: string
+          data_foto: string | null
+          encontro_id: string | null
+          id: string
+          legenda: string | null
+          ordem: number | null
+          tipo_foto: string
+          url: string
+        }
+        Insert: {
+          atividade_id: string
+          created_at?: string
+          data_foto?: string | null
+          encontro_id?: string | null
+          id?: string
+          legenda?: string | null
+          ordem?: number | null
+          tipo_foto?: string
+          url: string
+        }
+        Update: {
+          atividade_id?: string
+          created_at?: string
+          data_foto?: string | null
+          encontro_id?: string | null
+          id?: string
+          legenda?: string | null
+          ordem?: number | null
+          tipo_foto?: string
+          url?: string
+        }
+        Relationships: []
+      }
+      atividade_gestores: {
+        Row: {
+          atividade_id: string
+          created_at: string
+          id: string
+          usuario_id: string
+        }
+        Insert: {
+          atividade_id: string
+          created_at?: string
+          id?: string
+          usuario_id: string
+        }
+        Update: {
+          atividade_id?: string
+          created_at?: string
+          id?: string
+          usuario_id?: string
+        }
+        Relationships: []
+      }
+      atividade_inscritos: {
+        Row: {
+          atendido_id: string
+          atividade_id: string
+          created_at: string
+          data_inscricao: string
+          id: string
+          observacoes: string | null
+          status: string
+        }
+        Insert: {
+          atendido_id: string
+          atividade_id: string
+          created_at?: string
+          data_inscricao?: string
+          id?: string
+          observacoes?: string | null
+          status?: string
+        }
+        Update: {
+          atendido_id?: string
+          atividade_id?: string
+          created_at?: string
+          data_inscricao?: string
+          id?: string
+          observacoes?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       atividades: {
         Row: {
+          carga_horaria_horas: number | null
+          carga_horaria_minutos: number | null
+          controle_presenca: boolean
           created_at: string
           data: string | null
+          data_fim: string | null
+          data_inicio: string | null
+          descricao: string | null
           facilitador_id: string | null
+          formato_execucao: string
+          foto_capa_legenda: string | null
+          foto_capa_url: string | null
           horario_fim: string | null
           horario_inicio: string | null
           id: string
           local: string | null
+          media_final_conceito: boolean
+          numero_vagas: number | null
+          objetivo_relacionado: string | null
           observacoes: string | null
           participantes_atendidos: number | null
           participantes_previstos: number | null
+          periodo_matutino: boolean
+          periodo_noturno: boolean
+          periodo_vespertino: boolean
+          permite_ultrapassar_limite: boolean
           projeto_id: string | null
+          quem_pode_participar: string | null
+          resultado_esperado: string | null
           status: string
           tipo: string | null
           titulo: string
+          updated_at: string
         }
         Insert: {
+          carga_horaria_horas?: number | null
+          carga_horaria_minutos?: number | null
+          controle_presenca?: boolean
           created_at?: string
           data?: string | null
+          data_fim?: string | null
+          data_inicio?: string | null
+          descricao?: string | null
           facilitador_id?: string | null
+          formato_execucao?: string
+          foto_capa_legenda?: string | null
+          foto_capa_url?: string | null
           horario_fim?: string | null
           horario_inicio?: string | null
           id?: string
           local?: string | null
+          media_final_conceito?: boolean
+          numero_vagas?: number | null
+          objetivo_relacionado?: string | null
           observacoes?: string | null
           participantes_atendidos?: number | null
           participantes_previstos?: number | null
+          periodo_matutino?: boolean
+          periodo_noturno?: boolean
+          periodo_vespertino?: boolean
+          permite_ultrapassar_limite?: boolean
           projeto_id?: string | null
+          quem_pode_participar?: string | null
+          resultado_esperado?: string | null
           status?: string
           tipo?: string | null
           titulo: string
+          updated_at?: string
         }
         Update: {
+          carga_horaria_horas?: number | null
+          carga_horaria_minutos?: number | null
+          controle_presenca?: boolean
           created_at?: string
           data?: string | null
+          data_fim?: string | null
+          data_inicio?: string | null
+          descricao?: string | null
           facilitador_id?: string | null
+          formato_execucao?: string
+          foto_capa_legenda?: string | null
+          foto_capa_url?: string | null
           horario_fim?: string | null
           horario_inicio?: string | null
           id?: string
           local?: string | null
+          media_final_conceito?: boolean
+          numero_vagas?: number | null
+          objetivo_relacionado?: string | null
           observacoes?: string | null
           participantes_atendidos?: number | null
           participantes_previstos?: number | null
+          periodo_matutino?: boolean
+          periodo_noturno?: boolean
+          periodo_vespertino?: boolean
+          permite_ultrapassar_limite?: boolean
           projeto_id?: string | null
+          quem_pode_participar?: string | null
+          resultado_esperado?: string | null
           status?: string
           tipo?: string | null
           titulo?: string
+          updated_at?: string
         }
         Relationships: [
           {
@@ -492,6 +657,51 @@ export type Database = {
           status?: string
           titulo?: string
           valor?: number | null
+        }
+        Relationships: []
+      }
+      encontros_atividade: {
+        Row: {
+          atividade_id: string
+          created_at: string
+          data: string
+          horario_fim: string | null
+          horario_inicio: string | null
+          id: string
+          numero_presentes: number | null
+          observacoes: string | null
+          periodo: string | null
+          resumo: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          atividade_id: string
+          created_at?: string
+          data: string
+          horario_fim?: string | null
+          horario_inicio?: string | null
+          id?: string
+          numero_presentes?: number | null
+          observacoes?: string | null
+          periodo?: string | null
+          resumo?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          atividade_id?: string
+          created_at?: string
+          data?: string
+          horario_fim?: string | null
+          horario_inicio?: string | null
+          id?: string
+          numero_presentes?: number | null
+          observacoes?: string | null
+          periodo?: string | null
+          resumo?: string | null
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -777,6 +987,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      presencas_atividade: {
+        Row: {
+          atendido_id: string
+          created_at: string
+          encontro_id: string
+          id: string
+          observacao: string | null
+          presente: boolean
+        }
+        Insert: {
+          atendido_id: string
+          created_at?: string
+          encontro_id: string
+          id?: string
+          observacao?: string | null
+          presente?: boolean
+        }
+        Update: {
+          atendido_id?: string
+          created_at?: string
+          encontro_id?: string
+          id?: string
+          observacao?: string | null
+          presente?: boolean
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
