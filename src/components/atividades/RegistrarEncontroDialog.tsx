@@ -77,7 +77,7 @@ export function RegistrarEncontroDialog({ open, onClose, atividadeId, encontro, 
       periodo: v.periodo || null,
       status: v.status,
       resumo: v.resumo || null,
-      numero_presentes: Object.values(presencas).filter((x) => x.presente).length || Number(v.numero_presentes) || 0,
+      numero_presentes: Object.values(presencas).filter((x) => x.status === "presente").length || Number(v.numero_presentes) || 0,
       observacoes: v.observacoes || null,
     };
     let encId = encontro?.id;
@@ -91,8 +91,8 @@ export function RegistrarEncontroDialog({ open, onClose, atividadeId, encontro, 
     }
     if (controlePresenca && encId) {
       await supabase.from("presencas_atividade").delete().eq("encontro_id", encId);
-      const linhas = Object.entries(presencas).map(([atendido_id, { presente, observacao }]) => ({
-        encontro_id: encId, atendido_id, presente, observacao: observacao || null,
+      const linhas = Object.entries(presencas).map(([atendido_id, { status, observacao }]) => ({
+        encontro_id: encId, atendido_id, status, presente: status === "presente", observacao: observacao || null,
       }));
       if (linhas.length) await supabase.from("presencas_atividade").insert(linhas);
     }
@@ -190,23 +190,36 @@ export function RegistrarEncontroDialog({ open, onClose, atividadeId, encontro, 
 
           {controlePresenca && inscritos.length > 0 && (
             <div className="border rounded-lg">
-              <div className="px-3 py-2 border-b bg-muted/50 text-sm font-medium flex justify-between">
+              <div className="px-3 py-2 border-b bg-muted/50 text-sm font-medium flex flex-wrap gap-2 justify-between items-center">
                 <span>Chamada ({inscritos.length} inscritos)</span>
-                <span className="text-primary">{Object.values(presencas).filter((x) => x.presente).length} presentes</span>
+                <div className="flex gap-3 text-xs">
+                  <span className="text-success">✓ {Object.values(presencas).filter((x) => x.status === "presente").length} presentes</span>
+                  <span className="text-destructive">✗ {Object.values(presencas).filter((x) => x.status === "falta").length} faltas</span>
+                  <span className="text-warning">⏱ {Object.values(presencas).filter((x) => x.status === "justificada").length} justificadas</span>
+                </div>
               </div>
-              <ul className="divide-y max-h-64 overflow-y-auto">
+              <ul className="divide-y max-h-80 overflow-y-auto">
                 {inscritos.map((i) => {
                   const at = i.atendidos;
-                  const p = presencas[i.atendido_id] ?? { presente: false, observacao: "" };
+                  const p = presencas[i.atendido_id] ?? { status: "falta" as PresencaStatus, observacao: "" };
+                  const setStatus = (s: PresencaStatus) =>
+                    setPresencas({ ...presencas, [i.atendido_id]: { ...p, status: s } });
                   return (
-                    <li key={i.atendido_id} className="px-3 py-2 flex items-center gap-2">
-                      <Checkbox
-                        checked={p.presente}
-                        onCheckedChange={(c) => setPresencas({ ...presencas, [i.atendido_id]: { ...p, presente: !!c } })}
-                      />
-                      <span className="flex-1 text-sm">{at?.nome}</span>
+                    <li key={i.atendido_id} className="px-3 py-2 flex flex-col sm:flex-row sm:items-center gap-2">
+                      <span className="flex-1 text-sm font-medium truncate">{at?.nome}</span>
+                      <div className="flex gap-1">
+                        <PresBtn active={p.status === "presente"} variant="presente" onClick={() => setStatus("presente")}>
+                          <Check className="w-4 h-4" /> <span className="hidden sm:inline ml-1">Presente</span>
+                        </PresBtn>
+                        <PresBtn active={p.status === "falta"} variant="falta" onClick={() => setStatus("falta")}>
+                          <XIcon className="w-4 h-4" /> <span className="hidden sm:inline ml-1">Falta</span>
+                        </PresBtn>
+                        <PresBtn active={p.status === "justificada"} variant="justificada" onClick={() => setStatus("justificada")}>
+                          <Clock className="w-4 h-4" /> <span className="hidden sm:inline ml-1">Justif.</span>
+                        </PresBtn>
+                      </div>
                       <Input
-                        className="max-w-[200px] h-8"
+                        className="sm:max-w-[180px] h-9"
                         placeholder="Obs."
                         value={p.observacao}
                         onChange={(e) => setPresencas({ ...presencas, [i.atendido_id]: { ...p, observacao: e.target.value } })}
@@ -215,6 +228,18 @@ export function RegistrarEncontroDialog({ open, onClose, atividadeId, encontro, 
                   );
                 })}
               </ul>
+              <div className="px-3 py-2 border-t bg-muted/30 flex flex-wrap gap-2">
+                <Button type="button" variant="outline" size="sm" onClick={() => {
+                  const m = { ...presencas };
+                  inscritos.forEach((i) => { m[i.atendido_id] = { ...(m[i.atendido_id] ?? { observacao: "" }), status: "presente" }; });
+                  setPresencas(m);
+                }}>Marcar todos presentes</Button>
+                <Button type="button" variant="outline" size="sm" onClick={() => {
+                  const m = { ...presencas };
+                  inscritos.forEach((i) => { m[i.atendido_id] = { ...(m[i.atendido_id] ?? { observacao: "" }), status: "falta" }; });
+                  setPresencas(m);
+                }}>Marcar todos faltas</Button>
+              </div>
             </div>
           )}
 
