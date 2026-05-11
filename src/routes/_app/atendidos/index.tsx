@@ -151,10 +151,9 @@ function ListaAtendidos() {
           {canEdit && <Button asChild><Link to="/atendidos/novo"><Plus className="w-4 h-4 mr-1" /> Novo Atendido</Link></Button>}
           <Button variant="outline" onClick={exportCSV}><FileDown className="w-4 h-4 mr-1" /> Exportar</Button>
           {canEdit && (
-            <label className="inline-flex items-center px-3 h-9 text-sm border rounded-md cursor-pointer hover:bg-accent">
-              Importar CSV
-              <input type="file" accept=".csv" className="hidden" onChange={importCSV} />
-            </label>
+            <Button variant="outline" onClick={() => setImportOpen(true)}>
+              <Upload className="w-4 h-4 mr-1" /> Importar planilha
+            </Button>
           )}
         </div>
       </div>
