@@ -13,9 +13,13 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppInicioRouteImport } from './routes/_app/inicio'
+import { Route as AppProjetosIndexRouteImport } from './routes/_app/projetos/index'
 import { Route as AppEditaisIndexRouteImport } from './routes/_app/editais/index'
+import { Route as AppProjetosNovoRouteImport } from './routes/_app/projetos/novo'
 import { Route as AppEditaisNovoRouteImport } from './routes/_app/editais/novo'
+import { Route as AppProjetosIdIndexRouteImport } from './routes/_app/projetos/$id/index'
 import { Route as AppEditaisIdIndexRouteImport } from './routes/_app/editais/$id/index'
+import { Route as AppProjetosIdEditarRouteImport } from './routes/_app/projetos/$id/editar'
 import { Route as AppEditaisIdEditarRouteImport } from './routes/_app/editais/$id/editar'
 
 const AuthRoute = AuthRouteImport.update({
@@ -37,9 +41,19 @@ const AppInicioRoute = AppInicioRouteImport.update({
   path: '/inicio',
   getParentRoute: () => AppRoute,
 } as any)
+const AppProjetosIndexRoute = AppProjetosIndexRouteImport.update({
+  id: '/projetos/',
+  path: '/projetos/',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppEditaisIndexRoute = AppEditaisIndexRouteImport.update({
   id: '/editais/',
   path: '/editais/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProjetosNovoRoute = AppProjetosNovoRouteImport.update({
+  id: '/projetos/novo',
+  path: '/projetos/novo',
   getParentRoute: () => AppRoute,
 } as any)
 const AppEditaisNovoRoute = AppEditaisNovoRouteImport.update({
@@ -47,9 +61,19 @@ const AppEditaisNovoRoute = AppEditaisNovoRouteImport.update({
   path: '/editais/novo',
   getParentRoute: () => AppRoute,
 } as any)
+const AppProjetosIdIndexRoute = AppProjetosIdIndexRouteImport.update({
+  id: '/projetos/$id/',
+  path: '/projetos/$id/',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppEditaisIdIndexRoute = AppEditaisIdIndexRouteImport.update({
   id: '/editais/$id/',
   path: '/editais/$id/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProjetosIdEditarRoute = AppProjetosIdEditarRouteImport.update({
+  id: '/projetos/$id/editar',
+  path: '/projetos/$id/editar',
   getParentRoute: () => AppRoute,
 } as any)
 const AppEditaisIdEditarRoute = AppEditaisIdEditarRouteImport.update({
@@ -63,18 +87,26 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/inicio': typeof AppInicioRoute
   '/editais/novo': typeof AppEditaisNovoRoute
+  '/projetos/novo': typeof AppProjetosNovoRoute
   '/editais/': typeof AppEditaisIndexRoute
+  '/projetos/': typeof AppProjetosIndexRoute
   '/editais/$id/editar': typeof AppEditaisIdEditarRoute
+  '/projetos/$id/editar': typeof AppProjetosIdEditarRoute
   '/editais/$id/': typeof AppEditaisIdIndexRoute
+  '/projetos/$id/': typeof AppProjetosIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/inicio': typeof AppInicioRoute
   '/editais/novo': typeof AppEditaisNovoRoute
+  '/projetos/novo': typeof AppProjetosNovoRoute
   '/editais': typeof AppEditaisIndexRoute
+  '/projetos': typeof AppProjetosIndexRoute
   '/editais/$id/editar': typeof AppEditaisIdEditarRoute
+  '/projetos/$id/editar': typeof AppProjetosIdEditarRoute
   '/editais/$id': typeof AppEditaisIdIndexRoute
+  '/projetos/$id': typeof AppProjetosIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -83,9 +115,13 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_app/inicio': typeof AppInicioRoute
   '/_app/editais/novo': typeof AppEditaisNovoRoute
+  '/_app/projetos/novo': typeof AppProjetosNovoRoute
   '/_app/editais/': typeof AppEditaisIndexRoute
+  '/_app/projetos/': typeof AppProjetosIndexRoute
   '/_app/editais/$id/editar': typeof AppEditaisIdEditarRoute
+  '/_app/projetos/$id/editar': typeof AppProjetosIdEditarRoute
   '/_app/editais/$id/': typeof AppEditaisIdIndexRoute
+  '/_app/projetos/$id/': typeof AppProjetosIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -94,18 +130,26 @@ export interface FileRouteTypes {
     | '/auth'
     | '/inicio'
     | '/editais/novo'
+    | '/projetos/novo'
     | '/editais/'
+    | '/projetos/'
     | '/editais/$id/editar'
+    | '/projetos/$id/editar'
     | '/editais/$id/'
+    | '/projetos/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/inicio'
     | '/editais/novo'
+    | '/projetos/novo'
     | '/editais'
+    | '/projetos'
     | '/editais/$id/editar'
+    | '/projetos/$id/editar'
     | '/editais/$id'
+    | '/projetos/$id'
   id:
     | '__root__'
     | '/'
@@ -113,9 +157,13 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_app/inicio'
     | '/_app/editais/novo'
+    | '/_app/projetos/novo'
     | '/_app/editais/'
+    | '/_app/projetos/'
     | '/_app/editais/$id/editar'
+    | '/_app/projetos/$id/editar'
     | '/_app/editais/$id/'
+    | '/_app/projetos/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -154,11 +202,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInicioRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/projetos/': {
+      id: '/_app/projetos/'
+      path: '/projetos'
+      fullPath: '/projetos/'
+      preLoaderRoute: typeof AppProjetosIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/editais/': {
       id: '/_app/editais/'
       path: '/editais'
       fullPath: '/editais/'
       preLoaderRoute: typeof AppEditaisIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/projetos/novo': {
+      id: '/_app/projetos/novo'
+      path: '/projetos/novo'
+      fullPath: '/projetos/novo'
+      preLoaderRoute: typeof AppProjetosNovoRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/editais/novo': {
@@ -168,11 +230,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEditaisNovoRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/projetos/$id/': {
+      id: '/_app/projetos/$id/'
+      path: '/projetos/$id'
+      fullPath: '/projetos/$id/'
+      preLoaderRoute: typeof AppProjetosIdIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/editais/$id/': {
       id: '/_app/editais/$id/'
       path: '/editais/$id'
       fullPath: '/editais/$id/'
       preLoaderRoute: typeof AppEditaisIdIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/projetos/$id/editar': {
+      id: '/_app/projetos/$id/editar'
+      path: '/projetos/$id/editar'
+      fullPath: '/projetos/$id/editar'
+      preLoaderRoute: typeof AppProjetosIdEditarRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/editais/$id/editar': {
@@ -188,17 +264,25 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppInicioRoute: typeof AppInicioRoute
   AppEditaisNovoRoute: typeof AppEditaisNovoRoute
+  AppProjetosNovoRoute: typeof AppProjetosNovoRoute
   AppEditaisIndexRoute: typeof AppEditaisIndexRoute
+  AppProjetosIndexRoute: typeof AppProjetosIndexRoute
   AppEditaisIdEditarRoute: typeof AppEditaisIdEditarRoute
+  AppProjetosIdEditarRoute: typeof AppProjetosIdEditarRoute
   AppEditaisIdIndexRoute: typeof AppEditaisIdIndexRoute
+  AppProjetosIdIndexRoute: typeof AppProjetosIdIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppInicioRoute: AppInicioRoute,
   AppEditaisNovoRoute: AppEditaisNovoRoute,
+  AppProjetosNovoRoute: AppProjetosNovoRoute,
   AppEditaisIndexRoute: AppEditaisIndexRoute,
+  AppProjetosIndexRoute: AppProjetosIndexRoute,
   AppEditaisIdEditarRoute: AppEditaisIdEditarRoute,
+  AppProjetosIdEditarRoute: AppProjetosIdEditarRoute,
   AppEditaisIdIndexRoute: AppEditaisIdIndexRoute,
+  AppProjetosIdIndexRoute: AppProjetosIdIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
