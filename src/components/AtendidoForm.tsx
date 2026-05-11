@@ -308,13 +308,6 @@ function Field({ label, full, children }: any) {
     </div>
   );
 }
-function CheckField({ label, checked, onChange }: any) {
-  return (
-    <label className="flex items-center gap-2 text-sm cursor-pointer">
-      <Checkbox checked={checked} onCheckedChange={onChange} /> {label}
-    </label>
-  );
-}
 function CheckField({ label, checked, onChange }: { label: string; checked: boolean; onChange: (c: boolean) => void }) {
   return (
     <label className="flex items-center gap-2 text-sm cursor-pointer">
