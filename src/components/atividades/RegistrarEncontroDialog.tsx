@@ -8,8 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ENCONTRO_STATUS, PERIODOS } from "@/lib/atividades";
-import { Trash2, Upload } from "lucide-react";
+import { Trash2, Upload, Check, X as XIcon, Clock } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+
+type PresencaStatus = "presente" | "falta" | "justificada";
 
 interface Props {
   open: boolean;
