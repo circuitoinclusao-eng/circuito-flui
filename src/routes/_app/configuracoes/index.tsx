@@ -4,7 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth, ROLE_LABELS } from "@/lib/auth";
 import { PageHeader } from "@/components/AppLayout";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useServerFn } from "@tanstack/react-start";
+import { createUser } from "@/lib/admin-users.functions";
 import { toast } from "sonner";
+import { UserPlus } from "lucide-react";
 
 export const Route = createFileRoute("/_app/configuracoes/")({
   component: Config,
@@ -16,6 +23,7 @@ function Config() {
   const { hasRole, profile } = useAuth();
   const isAdmin = hasRole("administrador");
   const [users, setUsers] = useState<any[]>([]);
+  const [openNew, setOpenNew] = useState(false);
 
   useEffect(() => { if (isAdmin) load(); }, [isAdmin]);
 
@@ -46,7 +54,12 @@ function Config() {
 
       {isAdmin ? (
         <div className="bg-card border rounded-xl shadow-sm">
-          <div className="px-5 py-3 border-b font-semibold">Usuários e perfis</div>
+          <div className="px-5 py-3 border-b flex items-center justify-between gap-2">
+            <span className="font-semibold">Usuários e perfis</span>
+            <Button size="sm" onClick={() => setOpenNew(true)}>
+              <UserPlus className="w-4 h-4 mr-1" /> Novo usuário
+            </Button>
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-muted/50">
@@ -73,10 +86,87 @@ function Config() {
               </tbody>
             </table>
           </div>
+          <NovoUsuarioDialog open={openNew} onOpenChange={setOpenNew} onCreated={load} />
         </div>
       ) : (
         <p className="text-sm text-muted-foreground">Apenas administradores podem gerenciar usuários.</p>
       )}
     </>
+  );
+}
+
+function NovoUsuarioDialog({ open, onOpenChange, onCreated }: { open: boolean; onOpenChange: (v: boolean) => void; onCreated: () => void }) {
+  const create = useServerFn(createUser);
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState<typeof ROLES[number]>("colaborador");
+  const [loading, setLoading] = useState(false);
+
+  function reset() {
+    setNome(""); setEmail(""); setPassword(""); setRole("colaborador");
+  }
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await create({ data: { nome, email, password, role } });
+      toast.success("Usuário criado com sucesso.");
+      reset();
+      onOpenChange(false);
+      onCreated();
+    } catch (err: any) {
+      const msg = err?.message ?? (typeof err === "string" ? err : "Falha ao criar usuário.");
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function genPassword() {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+    let p = "";
+    for (let i = 0; i < 12; i++) p += chars[Math.floor(Math.random() * chars.length)];
+    setPassword(p + "!");
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader><DialogTitle>Novo usuário</DialogTitle></DialogHeader>
+        <form onSubmit={submit} className="space-y-3">
+          <div>
+            <Label>Nome</Label>
+            <Input value={nome} onChange={(e) => setNome(e.target.value)} required />
+          </div>
+          <div>
+            <Label>E-mail</Label>
+            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          </div>
+          <div>
+            <Label>Senha provisória</Label>
+            <div className="flex gap-2">
+              <Input value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
+              <Button type="button" variant="outline" onClick={genPassword}>Gerar</Button>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">Mínimo 8 caracteres. Compartilhe com o usuário com segurança.</p>
+          </div>
+          <div>
+            <Label>Perfil</Label>
+            <Select value={role} onValueChange={(v) => setRole(v as any)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {ROLES.map((r) => <SelectItem key={r} value={r}>{ROLE_LABELS[r]}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>Cancelar</Button>
+            <Button type="submit" disabled={loading}>{loading ? "Criando..." : "Criar usuário"}</Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
