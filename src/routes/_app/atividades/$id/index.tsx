@@ -114,6 +114,9 @@ function AtividadeDetalhe() {
               <Button variant="outline" size="sm"><FileDown className="w-4 h-4 mr-1" /> Exportar</Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setRelMensalOpen(true)}>
+                <FileText className="w-4 h-4 mr-2" /> Relatório mensal da atividade (PDF)
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={gerarRelInscritos}>Lista de inscritos (CSV)</DropdownMenuItem>
               <DropdownMenuItem onClick={gerarRelPresenca}>Relatório de presença (CSV)</DropdownMenuItem>
               <DropdownMenuItem onClick={() => window.print()}><Printer className="w-4 h-4 mr-2" /> Imprimir / PDF</DropdownMenuItem>
