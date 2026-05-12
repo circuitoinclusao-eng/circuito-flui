@@ -90,6 +90,9 @@ export function AtividadeForm({ id, initial }: Props) {
       resultId = data.id;
       setSavedId(resultId);
     }
+    if (resultId) {
+      try { await syncVinculos(resultId); } catch (err: any) { toast.error("Erro ao salvar vínculos: " + err.message); }
+    }
     setBusy(false);
     toast.success("Atividade salva.");
     if (!andContinue && resultId) {
