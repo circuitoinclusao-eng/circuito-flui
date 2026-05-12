@@ -18,7 +18,6 @@ export const createUser = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { userId, supabase } = context;
 
-    // Verify caller is admin
     const { data: roles, error: rolesErr } = await supabase
       .from("user_roles")
       .select("role")
@@ -27,7 +26,6 @@ export const createUser = createServerFn({ method: "POST" })
     const isAdmin = (roles ?? []).some((r: any) => r.role === "administrador");
     if (!isAdmin) throw new Response("Apenas administradores podem criar usuários.", { status: 403 });
 
-    // Create auth user (auto-confirmed so eles podem entrar imediatamente)
     const { data: created, error: createErr } = await supabaseAdmin.auth.admin.createUser({
       email: data.email,
       password: data.password,
@@ -40,17 +38,24 @@ export const createUser = createServerFn({ method: "POST" })
 
     const newId = created.user.id;
 
-    // Ensure profile exists (handle_new_user trigger usually does it, but be safe)
+    // Garante perfil + status aprovado (criação por admin é confiança direta)
     await supabaseAdmin
       .from("profiles")
-      .upsert({ id: newId, nome: data.nome, email: data.email }, { onConflict: "id" });
+      .upsert({ id: newId, nome: data.nome, email: data.email, status: "aprovado" }, { onConflict: "id" });
 
-    // Replace default role with selected role
     await supabaseAdmin.from("user_roles").delete().eq("user_id", newId);
     const { error: roleErr } = await supabaseAdmin
       .from("user_roles")
       .insert({ user_id: newId, role: data.role });
     if (roleErr) throw new Response(roleErr.message, { status: 500 });
+
+    await supabaseAdmin.from("audit_log").insert({
+      actor_id: userId,
+      acao: "criar_usuario",
+      entidade: "user",
+      entidade_id: newId,
+      detalhes: { role: data.role, email: data.email },
+    });
 
     return { id: newId };
   });

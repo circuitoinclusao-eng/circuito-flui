@@ -55,10 +55,26 @@ function LoginForm() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password: pw });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password: pw });
+    if (error) { setBusy(false); toast.error(error.message); return; }
+    // Verifica status do perfil antes de prosseguir
+    const uid = data.user?.id;
+    if (uid) {
+      const { data: prof } = await supabase.from("profiles").select("status").eq("id", uid).maybeSingle();
+      const st = (prof as any)?.status as string | undefined;
+      if (st === "bloqueado") {
+        await supabase.auth.signOut();
+        setBusy(false);
+        toast.error("Sua conta está bloqueada. Procure um administrador.");
+        return;
+      }
+      if (st && st !== "aprovado") {
+        // Mantém logado para mostrar a tela "pendente" do _app
+      }
+    }
     setBusy(false);
-    if (error) toast.error(error.message);
-    else { toast.success("Bem-vindo(a)!"); nav({ to: "/" }); }
+    toast.success("Bem-vindo(a)!");
+    nav({ to: "/" });
   }
 
   return (
@@ -83,6 +99,7 @@ function SignupForm() {
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState(false);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -94,9 +111,29 @@ function SignupForm() {
         data: { nome },
       },
     });
+    if (error) {
+      setBusy(false);
+      toast.error(error.message);
+      return;
+    }
+    // Não manter o usuário pendente logado
+    await supabase.auth.signOut();
     setBusy(false);
-    if (error) toast.error(error.message);
-    else toast.success("Conta criada! Verifique o e-mail se necessário, ou faça login.");
+    setDone(true);
+  }
+
+  if (done) {
+    return (
+      <div className="text-center space-y-3 py-2">
+        <div className="w-12 h-12 mx-auto rounded-full bg-primary/10 text-primary flex items-center justify-center">
+          ✓
+        </div>
+        <h3 className="font-semibold">Cadastro recebido</h3>
+        <p className="text-sm text-muted-foreground">
+          Aguarde aprovação de um administrador. Você poderá entrar assim que sua conta for liberada.
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -114,10 +151,10 @@ function SignupForm() {
         <Input id="pw2" type="password" required minLength={6} value={pw} onChange={(e) => setPw(e.target.value)} />
       </div>
       <Button type="submit" disabled={busy} className="w-full">
-        {busy ? "Criando..." : "Criar conta"}
+        {busy ? "Enviando..." : "Solicitar acesso"}
       </Button>
       <p className="text-xs text-muted-foreground">
-        O primeiro usuário cadastrado se torna administrador automaticamente.
+        Novos cadastros ficam pendentes até serem aprovados por um administrador.
       </p>
     </form>
   );

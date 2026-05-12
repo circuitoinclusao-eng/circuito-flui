@@ -14,6 +14,7 @@ import { ATENDIDO_STATUS, calcularIdade, hideCPF, maskCPF, statusClass, statusLa
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { ImportarAtendidosDialog } from "@/components/atendidos/ImportarAtendidosDialog";
+import { SignedImage } from "@/components/SignedImage";
 
 export const Route = createFileRoute("/_app/atendidos/")({ component: ListaAtendidos });
 
@@ -265,7 +266,7 @@ function ListaAtendidos() {
               {filtered.map((r) => (
                 <tr key={r.id} className="hover:bg-muted/30">
                   <td className="p-3"><Checkbox checked={sel.has(r.id)} onCheckedChange={() => toggleSel(r.id)} /></td>
-                  {cols.includes("foto") && <td className="p-3">{r.foto_url ? <img src={r.foto_url} className="w-8 h-8 rounded-full object-cover" /> : <div className="w-8 h-8 rounded-full bg-primary/10 text-primary text-xs flex items-center justify-center font-semibold">{r.nome?.[0]?.toUpperCase()}</div>}</td>}
+                  {cols.includes("foto") && <td className="p-3">{r.foto_url ? <SignedImage src={r.foto_url} className="w-8 h-8 rounded-full object-cover" fallback={<div className="w-8 h-8 rounded-full bg-primary/10" />} /> : <div className="w-8 h-8 rounded-full bg-primary/10 text-primary text-xs flex items-center justify-center font-semibold">{r.nome?.[0]?.toUpperCase()}</div>}</td>}
                   {cols.includes("nome") && <td className="p-3"><Link to="/atendidos/$id" params={{ id: r.id }} className="font-medium hover:text-primary">{r.nome}</Link><div className="text-xs text-muted-foreground">{r.matricula}</div></td>}
                   {cols.includes("status") && <td className="p-3"><span className={`inline-flex px-2 py-0.5 rounded-full text-xs ${statusClass(r.status)}`}>{statusLabel(r.status)}</span></td>}
                   {cols.includes("marcadores") && <td className="p-3"><div className="flex flex-wrap gap-1">{(marcadoresMap[r.id] ?? []).slice(0, 3).map((m) => <span key={m} className="text-[11px] bg-secondary px-1.5 py-0.5 rounded">{m}</span>)}</div></td>}

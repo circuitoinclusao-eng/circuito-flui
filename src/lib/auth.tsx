@@ -12,12 +12,16 @@ export const ROLE_LABELS: Record<Role, string> = {
   consulta: "Consulta",
 };
 
+export type ProfileStatus = "pendente" | "aprovado" | "bloqueado";
+
 interface AuthCtx {
   user: User | null;
   session: Session | null;
   loading: boolean;
   roles: Role[];
-  profile: { nome: string; email: string } | null;
+  profile: { nome: string; email: string; status: ProfileStatus } | null;
+  status: ProfileStatus | null;
+  isApproved: boolean;
   hasRole: (r: Role) => boolean;
   canEdit: boolean;
   isAdminOrCoord: boolean;
@@ -31,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [roles, setRoles] = useState<Role[]>([]);
-  const [profile, setProfile] = useState<{ nome: string; email: string } | null>(null);
+  const [profile, setProfile] = useState<{ nome: string; email: string; status: ProfileStatus } | null>(null);
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
@@ -56,20 +60,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function loadUserData(uid: string) {
     const [{ data: r }, { data: p }] = await Promise.all([
       supabase.from("user_roles").select("role").eq("user_id", uid),
-      supabase.from("profiles").select("nome,email").eq("id", uid).maybeSingle(),
+      supabase.from("profiles").select("nome,email,status").eq("id", uid).maybeSingle(),
     ]);
     setRoles((r ?? []).map((x: any) => x.role as Role));
-    setProfile(p as any);
+    setProfile(p ? { nome: (p as any).nome, email: (p as any).email, status: ((p as any).status ?? "pendente") as ProfileStatus } : null);
   }
 
-  const hasRole = (r: Role) => roles.includes(r);
-  const isAdminOrCoord = roles.some((r) => r === "administrador" || r === "coordenador");
-  const canEdit = roles.some((r) => r === "administrador" || r === "coordenador" || r === "colaborador" || r === "professor");
+  const status = profile?.status ?? null;
+  const isApproved = status === "aprovado";
+  const hasRole = (r: Role) => isApproved && roles.includes(r);
+  const isAdminOrCoord = isApproved && roles.some((r) => r === "administrador" || r === "coordenador");
+  const canEdit = isApproved && roles.some((r) => r === "administrador" || r === "coordenador" || r === "colaborador" || r === "professor");
 
   return (
     <Ctx.Provider
       value={{
-        user, session, loading, roles, profile, hasRole, canEdit, isAdminOrCoord,
+        user, session, loading, roles, profile, status, isApproved,
+        hasRole, canEdit, isAdminOrCoord,
         signOut: async () => { await supabase.auth.signOut(); },
       }}
     >

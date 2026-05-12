@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { useServerFn } from "@tanstack/react-start";
 import { createUser } from "@/lib/admin-users.functions";
 import { toast } from "sonner";
-import { UserPlus } from "lucide-react";
+import { UserPlus, ShieldCheck, ShieldOff, Check } from "lucide-react";
 
 export const Route = createFileRoute("/_app/configuracoes/")({
   component: Config,
@@ -38,9 +38,22 @@ function Config() {
   async function changeRole(userId: string, currentRoleId: string | undefined, newRole: string) {
     if (currentRoleId) await supabase.from("user_roles").delete().eq("id", currentRoleId);
     const { error } = await supabase.from("user_roles").insert({ user_id: userId, role: newRole as any });
-    if (error) toast.error(error.message);
-    else { toast.success("Perfil atualizado."); load(); }
+    if (error) return toast.error(error.message);
+    await supabase.from("audit_log").insert({ acao: "alterar_papel", entidade: "user", entidade_id: userId, detalhes: { role: newRole } });
+    toast.success("Perfil atualizado.");
+    load();
   }
+
+  async function changeStatus(userId: string, novoStatus: "aprovado" | "bloqueado" | "pendente") {
+    const { error } = await supabase.from("profiles").update({ status: novoStatus }).eq("id", userId);
+    if (error) return toast.error(error.message);
+    await supabase.from("audit_log").insert({ acao: `status_${novoStatus}`, entidade: "user", entidade_id: userId });
+    toast.success(novoStatus === "aprovado" ? "Usuário aprovado." : novoStatus === "bloqueado" ? "Usuário bloqueado." : "Status atualizado.");
+    load();
+  }
+
+  const pendentes = users.filter((u) => u.status === "pendente");
+  const ativos = users.filter((u) => u.status !== "pendente");
 
   return (
     <>
@@ -52,44 +65,105 @@ function Config() {
         <p className="text-sm"><span className="text-muted-foreground">E-mail:</span> {profile?.email}</p>
       </div>
 
-      {isAdmin ? (
-        <div className="bg-card border rounded-xl shadow-sm">
-          <div className="px-5 py-3 border-b flex items-center justify-between gap-2">
-            <span className="font-semibold">Usuários e perfis</span>
-            <Button size="sm" onClick={() => setOpenNew(true)}>
-              <UserPlus className="w-4 h-4 mr-1" /> Novo usuário
-            </Button>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/50">
-                <tr><th className="text-left px-4 py-2">Nome</th><th className="text-left px-4 py-2">E-mail</th><th className="text-left px-4 py-2">Perfil</th></tr>
-              </thead>
-              <tbody>
-                {users.map((u) => {
-                  const cur = u.roles[0];
-                  return (
-                    <tr key={u.id} className="border-t">
-                      <td className="px-4 py-2 font-medium">{u.nome}</td>
-                      <td className="px-4 py-2">{u.email}</td>
-                      <td className="px-4 py-2">
-                        <Select value={cur?.role ?? ""} onValueChange={(v) => changeRole(u.id, cur?.id, v)}>
-                          <SelectTrigger className="w-44"><SelectValue placeholder="—" /></SelectTrigger>
-                          <SelectContent>
-                            {ROLES.map((r) => <SelectItem key={r} value={r}>{ROLE_LABELS[r]}</SelectItem>)}
-                          </SelectContent>
-                        </Select>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+      {!isAdmin ? (
+        <p className="text-sm text-muted-foreground">Apenas administradores podem gerenciar usuários.</p>
+      ) : (
+        <>
+          {pendentes.length > 0 && (
+            <div className="bg-card border rounded-xl shadow-sm mb-6">
+              <div className="px-5 py-3 border-b flex items-center justify-between gap-2">
+                <span className="font-semibold">Cadastros pendentes ({pendentes.length})</span>
+              </div>
+              <ul className="divide-y">
+                {pendentes.map((u) => (
+                  <li key={u.id} className="p-4 flex items-center justify-between gap-3 flex-wrap">
+                    <div>
+                      <div className="font-medium">{u.nome}</div>
+                      <div className="text-xs text-muted-foreground">{u.email}</div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Select defaultValue="colaborador" onValueChange={async (v) => {
+                        const cur = u.roles[0];
+                        await changeRole(u.id, cur?.id, v);
+                      }}>
+                        <SelectTrigger className="w-40"><SelectValue placeholder="Definir perfil" /></SelectTrigger>
+                        <SelectContent>
+                          {ROLES.map((r) => <SelectItem key={r} value={r}>{ROLE_LABELS[r]}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                      <Button size="sm" onClick={() => changeStatus(u.id, "aprovado")}>
+                        <Check className="w-4 h-4 mr-1" /> Aprovar
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => changeStatus(u.id, "bloqueado")}>
+                        <ShieldOff className="w-4 h-4 mr-1" /> Bloquear
+                      </Button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <div className="bg-card border rounded-xl shadow-sm">
+            <div className="px-5 py-3 border-b flex items-center justify-between gap-2">
+              <span className="font-semibold">Usuários e perfis</span>
+              <Button size="sm" onClick={() => setOpenNew(true)}>
+                <UserPlus className="w-4 h-4 mr-1" /> Novo usuário
+              </Button>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/50">
+                  <tr>
+                    <th className="text-left px-4 py-2">Nome</th>
+                    <th className="text-left px-4 py-2">E-mail</th>
+                    <th className="text-left px-4 py-2">Perfil</th>
+                    <th className="text-left px-4 py-2">Status</th>
+                    <th className="text-left px-4 py-2">Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ativos.map((u) => {
+                    const cur = u.roles[0];
+                    const st = u.status as string;
+                    return (
+                      <tr key={u.id} className="border-t">
+                        <td className="px-4 py-2 font-medium">{u.nome}</td>
+                        <td className="px-4 py-2">{u.email}</td>
+                        <td className="px-4 py-2">
+                          <Select value={cur?.role ?? ""} onValueChange={(v) => changeRole(u.id, cur?.id, v)}>
+                            <SelectTrigger className="w-44"><SelectValue placeholder="—" /></SelectTrigger>
+                            <SelectContent>
+                              {ROLES.map((r) => <SelectItem key={r} value={r}>{ROLE_LABELS[r]}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                        </td>
+                        <td className="px-4 py-2">
+                          <span className={`text-xs px-2 py-1 rounded-full ${st === "aprovado" ? "bg-emerald-100 text-emerald-700" : st === "bloqueado" ? "bg-destructive/10 text-destructive" : "bg-amber-100 text-amber-700"}`}>
+                            {st === "aprovado" ? "Aprovado" : st === "bloqueado" ? "Bloqueado" : "Pendente"}
+                          </span>
+                        </td>
+                        <td className="px-4 py-2">
+                          {st !== "aprovado" && (
+                            <Button size="sm" variant="outline" className="mr-2" onClick={() => changeStatus(u.id, "aprovado")}>
+                              <ShieldCheck className="w-4 h-4 mr-1" /> Aprovar
+                            </Button>
+                          )}
+                          {st !== "bloqueado" && (
+                            <Button size="sm" variant="outline" onClick={() => changeStatus(u.id, "bloqueado")}>
+                              <ShieldOff className="w-4 h-4 mr-1" /> Bloquear
+                            </Button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
           <NovoUsuarioDialog open={openNew} onOpenChange={setOpenNew} onCreated={load} />
-        </div>
-      ) : (
-        <p className="text-sm text-muted-foreground">Apenas administradores podem gerenciar usuários.</p>
+        </>
       )}
     </>
   );
@@ -112,13 +186,12 @@ function NovoUsuarioDialog({ open, onOpenChange, onCreated }: { open: boolean; o
     setLoading(true);
     try {
       await create({ data: { nome, email, password, role } });
-      toast.success("Usuário criado com sucesso.");
+      toast.success("Usuário criado e aprovado.");
       reset();
       onOpenChange(false);
       onCreated();
     } catch (err: any) {
-      const msg = err?.message ?? (typeof err === "string" ? err : "Falha ao criar usuário.");
-      toast.error(msg);
+      toast.error(err?.message ?? "Falha ao criar usuário.");
     } finally {
       setLoading(false);
     }
@@ -136,14 +209,8 @@ function NovoUsuarioDialog({ open, onOpenChange, onCreated }: { open: boolean; o
       <DialogContent className="sm:max-w-md">
         <DialogHeader><DialogTitle>Novo usuário</DialogTitle></DialogHeader>
         <form onSubmit={submit} className="space-y-3">
-          <div>
-            <Label>Nome</Label>
-            <Input value={nome} onChange={(e) => setNome(e.target.value)} required />
-          </div>
-          <div>
-            <Label>E-mail</Label>
-            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          </div>
+          <div><Label>Nome</Label><Input value={nome} onChange={(e) => setNome(e.target.value)} required /></div>
+          <div><Label>E-mail</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></div>
           <div>
             <Label>Senha provisória</Label>
             <div className="flex gap-2">
