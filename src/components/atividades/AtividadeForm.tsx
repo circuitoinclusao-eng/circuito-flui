@@ -167,12 +167,20 @@ export function AtividadeForm({ id, initial }: Props) {
 
       {/* BLOCO 2 - Responsáveis */}
       <Section title="2. Responsáveis">
-        <p className="text-sm text-muted-foreground mb-3">
-          Vincule educadores e gestores na tela de detalhe da atividade após salvar.
-        </p>
-        <div>
-          <Label>Local</Label>
-          <Input value={v.local ?? ""} onChange={(e) => set("local", e.target.value)} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label className="block mb-2">Educadores</Label>
+            <UsuariosSelector label="Educadores" selectedIds={educadores} onChange={setEducadores} />
+            <p className="text-[11px] text-muted-foreground mt-1">Os vínculos são salvos junto com a atividade.</p>
+          </div>
+          <div>
+            <Label className="block mb-2">Gestores</Label>
+            <UsuariosSelector label="Gestores" selectedIds={gestores} onChange={setGestores} />
+          </div>
+          <div className="md:col-span-2">
+            <Label>Local</Label>
+            <Input value={v.local ?? ""} onChange={(e) => set("local", e.target.value)} />
+          </div>
         </div>
       </Section>
 
