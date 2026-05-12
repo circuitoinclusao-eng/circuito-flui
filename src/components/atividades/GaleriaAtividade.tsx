@@ -2,8 +2,9 @@ import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2, Camera, Download, Image as ImgIcon } from "lucide-react";
+import { Trash2, Camera, Download, Image as ImgIcon, ChevronUp, ChevronDown, GripVertical } from "lucide-react";
 import { toast } from "sonner";
+import { compressImage } from "@/lib/imageCompression";
 
 interface Props {
   atividadeId: string;
@@ -16,10 +17,13 @@ export function GaleriaAtividade({ atividadeId, canEdit }: Props) {
   const [filtroMes, setFiltroMes] = useState<string>("");
   const [filtroEnc, setFiltroEnc] = useState<string>("");
   const [busy, setBusy] = useState(false);
+  const [dragId, setDragId] = useState<string | null>(null);
 
   async function load() {
     const [{ data: f }, { data: e }] = await Promise.all([
-      supabase.from("atividade_fotos").select("*").eq("atividade_id", atividadeId).order("data_foto", { ascending: false }),
+      supabase.from("atividade_fotos").select("*").eq("atividade_id", atividadeId)
+        .order("ordem", { ascending: true })
+        .order("data_foto", { ascending: false }),
       supabase.from("encontros_atividade").select("id, data").eq("atividade_id", atividadeId).order("data"),
     ]);
     setFotos(f ?? []);
@@ -42,7 +46,13 @@ export function GaleriaAtividade({ atividadeId, canEdit }: Props) {
     const files = e.target.files;
     if (!files?.length) return;
     setBusy(true);
-    for (const file of Array.from(files)) {
+    const proximaOrdem = (fotos[fotos.length - 1]?.ordem ?? 0) + 1;
+    let idx = 0;
+    for (const original of Array.from(files)) {
+      const tid = toast.loading("Otimizando imagem antes do envio...");
+      let file: File = original;
+      try { file = await compressImage(original); } catch { /* segue com original */ }
+      toast.dismiss(tid);
       const path = `${atividadeId}/galeria/${Date.now()}-${file.name}`;
       const { error: upErr } = await supabase.storage.from("fotos").upload(path, file);
       if (upErr) { toast.error(upErr.message); continue; }
@@ -50,7 +60,9 @@ export function GaleriaAtividade({ atividadeId, canEdit }: Props) {
       await supabase.from("atividade_fotos").insert({
         atividade_id: atividadeId, tipo_foto: "galeria",
         url: pub.publicUrl, data_foto: new Date().toISOString().slice(0, 10),
+        ordem: proximaOrdem + idx,
       });
+      idx++;
     }
     setBusy(false);
     e.target.value = "";
@@ -66,6 +78,32 @@ export function GaleriaAtividade({ atividadeId, canEdit }: Props) {
 
   async function setLegenda(id: string, legenda: string) {
     await supabase.from("atividade_fotos").update({ legenda: legenda || null }).eq("id", id);
+  }
+
+  async function reordenar(novaOrdem: any[]) {
+    setFotos(novaOrdem);
+    const updates = novaOrdem.map((f, i) =>
+      supabase.from("atividade_fotos").update({ ordem: i + 1 }).eq("id", f.id)
+    );
+    await Promise.all(updates);
+  }
+
+  function moverParaIndex(fromId: string, toIndex: number) {
+    const arr = [...filtradas];
+    const fromIdx = arr.findIndex((x) => x.id === fromId);
+    if (fromIdx < 0) return;
+    const [item] = arr.splice(fromIdx, 1);
+    arr.splice(Math.max(0, Math.min(arr.length, toIndex)), 0, item);
+    // Mescla nova ordem das filtradas no array completo
+    const idsFiltradas = new Set(arr.map((x) => x.id));
+    const restantes = fotos.filter((x) => !idsFiltradas.has(x.id));
+    reordenar([...arr, ...restantes]);
+  }
+
+  function mover(id: string, dir: -1 | 1) {
+    const idx = filtradas.findIndex((x) => x.id === id);
+    if (idx < 0) return;
+    moverParaIndex(id, idx + dir);
   }
 
   return (
@@ -100,10 +138,27 @@ export function GaleriaAtividade({ atividadeId, canEdit }: Props) {
           <p className="text-center text-sm text-muted-foreground py-8">Nenhuma foto na galeria.</p>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {filtradas.map((f) => (
-              <div key={f.id} className="border rounded-lg overflow-hidden bg-muted/20">
+            {filtradas.map((f, idx) => (
+              <div
+                key={f.id}
+                className={`border rounded-lg overflow-hidden bg-muted/20 transition ${dragId === f.id ? "opacity-40" : ""}`}
+                draggable={canEdit}
+                onDragStart={() => setDragId(f.id)}
+                onDragEnd={() => setDragId(null)}
+                onDragOver={(e) => { if (canEdit && dragId && dragId !== f.id) e.preventDefault(); }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  if (canEdit && dragId && dragId !== f.id) moverParaIndex(dragId, idx);
+                  setDragId(null);
+                }}
+              >
                 <div className="aspect-square relative group">
-                  <img src={f.url} alt={f.legenda ?? ""} className="w-full h-full object-cover" />
+                  <img src={f.url} alt={f.legenda ?? ""} className="w-full h-full object-cover pointer-events-none" />
+                  {canEdit && (
+                    <div className="absolute top-1 left-1 bg-black/50 text-white text-[10px] px-1.5 py-0.5 rounded flex items-center gap-1 opacity-0 group-hover:opacity-100 transition cursor-grab">
+                      <GripVertical className="w-3 h-3" /> arraste
+                    </div>
+                  )}
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100">
                     <Button size="icon" variant="secondary" className="h-8 w-8" asChild>
                       <a href={f.url} download target="_blank" rel="noreferrer"><Download className="w-4 h-4" /></a>
@@ -113,16 +168,23 @@ export function GaleriaAtividade({ atividadeId, canEdit }: Props) {
                     )}
                   </div>
                 </div>
-                {canEdit ? (
-                  <Input
-                    placeholder="Legenda..."
-                    defaultValue={f.legenda ?? ""}
-                    onBlur={(e) => setLegenda(f.id, e.target.value)}
-                    className="h-8 text-xs border-0 rounded-none"
-                  />
-                ) : (
-                  f.legenda && <div className="px-2 py-1 text-xs truncate">{f.legenda}</div>
+                {canEdit && (
+                  <div className="flex items-center border-t">
+                    <Button type="button" size="icon" variant="ghost" className="h-7 w-7 rounded-none" onClick={() => mover(f.id, -1)} disabled={idx === 0} aria-label="Mover para cima">
+                      <ChevronUp className="w-4 h-4" />
+                    </Button>
+                    <Button type="button" size="icon" variant="ghost" className="h-7 w-7 rounded-none" onClick={() => mover(f.id, 1)} disabled={idx === filtradas.length - 1} aria-label="Mover para baixo">
+                      <ChevronDown className="w-4 h-4" />
+                    </Button>
+                    <Input
+                      placeholder="Legenda..."
+                      defaultValue={f.legenda ?? ""}
+                      onBlur={(e) => setLegenda(f.id, e.target.value)}
+                      className="h-7 text-xs border-0 rounded-none flex-1"
+                    />
+                  </div>
                 )}
+                {!canEdit && f.legenda && <div className="px-2 py-1 text-xs truncate border-t">{f.legenda}</div>}
               </div>
             ))}
           </div>

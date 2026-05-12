@@ -7,7 +7,8 @@ import { CapaUpload } from "@/components/atividades/CapaUpload";
 import { CalendarioEncontros } from "@/components/atividades/CalendarioEncontros";
 import { ListaInscritos } from "@/components/atividades/ListaInscritos";
 import { GaleriaAtividade } from "@/components/atividades/GaleriaAtividade";
-import { Pencil, FileDown, Printer } from "lucide-react";
+import { RelatorioMensalDialog } from "@/components/atividades/RelatorioMensalDialog";
+import { Pencil, FileDown, Printer, FileText } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { downloadCSV, calcularIdade, statusEncontroLabel } from "@/lib/atividades";
 import { toast } from "sonner";
@@ -21,6 +22,9 @@ function AtividadeDetalhe() {
   const { canEdit } = useAuth();
   const [ativ, setAtiv] = useState<any>(null);
   const [projeto, setProjeto] = useState<any>(null);
+  const [educadores, setEducadores] = useState<string[]>([]);
+  const [gestores, setGestores] = useState<string[]>([]);
+  const [relMensalOpen, setRelMensalOpen] = useState(false);
 
   const load = useCallback(async () => {
     const { data: a } = await supabase.from("atividades").select("*").eq("id", id).maybeSingle();
@@ -31,6 +35,12 @@ function AtividadeDetalhe() {
     } else {
       setProjeto(null);
     }
+    const { data: edu } = await supabase
+      .from("atividade_educadores").select("usuario_id, profiles:usuario_id(nome)").eq("atividade_id", id);
+    setEducadores((edu ?? []).map((r: any) => r.profiles?.nome).filter(Boolean));
+    const { data: ges } = await supabase
+      .from("atividade_gestores").select("usuario_id, profiles:usuario_id(nome)").eq("atividade_id", id);
+    setGestores((ges ?? []).map((r: any) => r.profiles?.nome).filter(Boolean));
   }, [id]);
 
   useEffect(() => { load(); }, [load]);
@@ -104,6 +114,9 @@ function AtividadeDetalhe() {
               <Button variant="outline" size="sm"><FileDown className="w-4 h-4 mr-1" /> Exportar</Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setRelMensalOpen(true)}>
+                <FileText className="w-4 h-4 mr-2" /> Relatório mensal da atividade (PDF)
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={gerarRelInscritos}>Lista de inscritos (CSV)</DropdownMenuItem>
               <DropdownMenuItem onClick={gerarRelPresenca}>Relatório de presença (CSV)</DropdownMenuItem>
               <DropdownMenuItem onClick={() => window.print()}><Printer className="w-4 h-4 mr-2" /> Imprimir / PDF</DropdownMenuItem>
@@ -142,6 +155,8 @@ function AtividadeDetalhe() {
         )}
         <Stat label="Períodos" value={[ativ.periodo_matutino && "Matutino", ativ.periodo_vespertino && "Vespertino", ativ.periodo_noturno && "Noturno"].filter(Boolean).join(", ") || "—"} />
         {ativ.local && <Stat label="Local" value={ativ.local} />}
+        <Stat label="Educadores" value={educadores.length ? educadores.join(", ") : "—"} />
+        <Stat label="Gestores" value={gestores.length ? gestores.join(", ") : "—"} />
       </div>
 
       {ativ.descricao && (
@@ -156,6 +171,8 @@ function AtividadeDetalhe() {
         <ListaInscritos atividadeId={id} canEdit={canEdit} numeroVagas={ativ.numero_vagas} />
         <GaleriaAtividade atividadeId={id} canEdit={canEdit} />
       </div>
+
+      <RelatorioMensalDialog open={relMensalOpen} onClose={() => setRelMensalOpen(false)} atividadeId={id} />
     </>
   );
 }

@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FORMATO_EXECUCAO, MODALIDADES } from "@/lib/atividades";
 import { CapaUpload } from "./CapaUpload";
+import { UsuariosSelector } from "./UsuariosSelector";
 import { toast } from "sonner";
 
 interface Props {
@@ -34,10 +35,37 @@ export function AtividadeForm({ id, initial }: Props) {
   const [projetos, setProjetos] = useState<any[]>([]);
   const [busy, setBusy] = useState(false);
   const [savedId, setSavedId] = useState<string | undefined>(id);
+  const [educadores, setEducadores] = useState<string[]>([]);
+  const [gestores, setGestores] = useState<string[]>([]);
 
   useEffect(() => {
     supabase.from("projetos").select("id,titulo,numero_projeto").order("titulo").then(({ data }) => setProjetos(data ?? []));
   }, []);
+
+  useEffect(() => {
+    if (!savedId) return;
+    supabase.from("atividade_educadores").select("usuario_id").eq("atividade_id", savedId)
+      .then(({ data }) => setEducadores((data ?? []).map((r: any) => r.usuario_id)));
+    supabase.from("atividade_gestores").select("usuario_id").eq("atividade_id", savedId)
+      .then(({ data }) => setGestores((data ?? []).map((r: any) => r.usuario_id)));
+  }, [savedId]);
+
+  async function syncVinculos(atividadeId: string) {
+    // educadores
+    const { data: edExist } = await supabase.from("atividade_educadores").select("usuario_id").eq("atividade_id", atividadeId);
+    const edAtuais = new Set((edExist ?? []).map((r: any) => r.usuario_id));
+    const edNovos = educadores.filter((u) => !edAtuais.has(u));
+    const edRemover = [...edAtuais].filter((u) => !educadores.includes(u as string));
+    if (edNovos.length) await supabase.from("atividade_educadores").insert(edNovos.map((u) => ({ atividade_id: atividadeId, usuario_id: u })));
+    if (edRemover.length) await supabase.from("atividade_educadores").delete().eq("atividade_id", atividadeId).in("usuario_id", edRemover as string[]);
+    // gestores
+    const { data: gExist } = await supabase.from("atividade_gestores").select("usuario_id").eq("atividade_id", atividadeId);
+    const gAtuais = new Set((gExist ?? []).map((r: any) => r.usuario_id));
+    const gNovos = gestores.filter((u) => !gAtuais.has(u));
+    const gRemover = [...gAtuais].filter((u) => !gestores.includes(u as string));
+    if (gNovos.length) await supabase.from("atividade_gestores").insert(gNovos.map((u) => ({ atividade_id: atividadeId, usuario_id: u })));
+    if (gRemover.length) await supabase.from("atividade_gestores").delete().eq("atividade_id", atividadeId).in("usuario_id", gRemover as string[]);
+  }
 
   function set(k: string, val: any) { setV((p: any) => ({ ...p, [k]: val })); }
 
@@ -61,6 +89,9 @@ export function AtividadeForm({ id, initial }: Props) {
       if (error) { toast.error(error.message); setBusy(false); return; }
       resultId = data.id;
       setSavedId(resultId);
+    }
+    if (resultId) {
+      try { await syncVinculos(resultId); } catch (err: any) { toast.error("Erro ao salvar vínculos: " + err.message); }
     }
     setBusy(false);
     toast.success("Atividade salva.");
@@ -136,12 +167,20 @@ export function AtividadeForm({ id, initial }: Props) {
 
       {/* BLOCO 2 - Responsáveis */}
       <Section title="2. Responsáveis">
-        <p className="text-sm text-muted-foreground mb-3">
-          Vincule educadores e gestores na tela de detalhe da atividade após salvar.
-        </p>
-        <div>
-          <Label>Local</Label>
-          <Input value={v.local ?? ""} onChange={(e) => set("local", e.target.value)} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label className="block mb-2">Educadores</Label>
+            <UsuariosSelector label="Educadores" selectedIds={educadores} onChange={setEducadores} />
+            <p className="text-[11px] text-muted-foreground mt-1">Os vínculos são salvos junto com a atividade.</p>
+          </div>
+          <div>
+            <Label className="block mb-2">Gestores</Label>
+            <UsuariosSelector label="Gestores" selectedIds={gestores} onChange={setGestores} />
+          </div>
+          <div className="md:col-span-2">
+            <Label>Local</Label>
+            <Input value={v.local ?? ""} onChange={(e) => set("local", e.target.value)} />
+          </div>
         </div>
       </Section>
 

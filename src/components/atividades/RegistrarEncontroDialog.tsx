@@ -11,6 +11,7 @@ import { ENCONTRO_STATUS, PERIODOS } from "@/lib/atividades";
 import { Trash2, Upload, Check, X as XIcon, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { compressImage } from "@/lib/imageCompression";
 
 type PresencaStatus = "presente" | "falta" | "justificada";
 
@@ -109,7 +110,11 @@ export function RegistrarEncontroDialog({ open, onClose, atividadeId, encontro, 
       return;
     }
     setBusy(true);
-    for (const file of Array.from(files)) {
+    for (const original of Array.from(files)) {
+      const tid = toast.loading("Otimizando imagem antes do envio...");
+      let file: File = original;
+      try { file = await compressImage(original); } catch { /* segue */ }
+      toast.dismiss(tid);
       const path = `${atividadeId}/encontro-${encontro.id}/${Date.now()}-${file.name}`;
       const { error: upErr } = await supabase.storage.from("fotos").upload(path, file);
       if (upErr) { toast.error(upErr.message); continue; }

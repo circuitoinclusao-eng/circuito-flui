@@ -40,6 +40,7 @@ import { Route as AppProjetosIdEditarRouteImport } from './routes/_app/projetos/
 import { Route as AppGruposIdEditarRouteImport } from './routes/_app/grupos/$id/editar'
 import { Route as AppEditaisIdEditarRouteImport } from './routes/_app/editais/$id/editar'
 import { Route as AppContatosIdEditarRouteImport } from './routes/_app/contatos/$id/editar'
+import { Route as AppAtividadesIdRelatorioMensalRouteImport } from './routes/_app/atividades/$id/relatorio-mensal'
 import { Route as AppAtividadesIdRelatorioRouteImport } from './routes/_app/atividades/$id/relatorio'
 import { Route as AppAtividadesIdEditarRouteImport } from './routes/_app/atividades/$id/editar'
 import { Route as AppAtendimentosIdEditarRouteImport } from './routes/_app/atendimentos/$id/editar'
@@ -199,6 +200,12 @@ const AppContatosIdEditarRoute = AppContatosIdEditarRouteImport.update({
   path: '/contatos/$id/editar',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAtividadesIdRelatorioMensalRoute =
+  AppAtividadesIdRelatorioMensalRouteImport.update({
+    id: '/atividades/$id/relatorio-mensal',
+    path: '/atividades/$id/relatorio-mensal',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppAtividadesIdRelatorioRoute =
   AppAtividadesIdRelatorioRouteImport.update({
     id: '/atividades/$id/relatorio',
@@ -245,6 +252,7 @@ export interface FileRoutesByFullPath {
   '/atendimentos/$id/editar': typeof AppAtendimentosIdEditarRoute
   '/atividades/$id/editar': typeof AppAtividadesIdEditarRoute
   '/atividades/$id/relatorio': typeof AppAtividadesIdRelatorioRoute
+  '/atividades/$id/relatorio-mensal': typeof AppAtividadesIdRelatorioMensalRoute
   '/contatos/$id/editar': typeof AppContatosIdEditarRoute
   '/editais/$id/editar': typeof AppEditaisIdEditarRoute
   '/grupos/$id/editar': typeof AppGruposIdEditarRoute
@@ -281,6 +289,7 @@ export interface FileRoutesByTo {
   '/atendimentos/$id/editar': typeof AppAtendimentosIdEditarRoute
   '/atividades/$id/editar': typeof AppAtividadesIdEditarRoute
   '/atividades/$id/relatorio': typeof AppAtividadesIdRelatorioRoute
+  '/atividades/$id/relatorio-mensal': typeof AppAtividadesIdRelatorioMensalRoute
   '/contatos/$id/editar': typeof AppContatosIdEditarRoute
   '/editais/$id/editar': typeof AppEditaisIdEditarRoute
   '/grupos/$id/editar': typeof AppGruposIdEditarRoute
@@ -319,6 +328,7 @@ export interface FileRoutesById {
   '/_app/atendimentos/$id/editar': typeof AppAtendimentosIdEditarRoute
   '/_app/atividades/$id/editar': typeof AppAtividadesIdEditarRoute
   '/_app/atividades/$id/relatorio': typeof AppAtividadesIdRelatorioRoute
+  '/_app/atividades/$id/relatorio-mensal': typeof AppAtividadesIdRelatorioMensalRoute
   '/_app/contatos/$id/editar': typeof AppContatosIdEditarRoute
   '/_app/editais/$id/editar': typeof AppEditaisIdEditarRoute
   '/_app/grupos/$id/editar': typeof AppGruposIdEditarRoute
@@ -357,6 +367,7 @@ export interface FileRouteTypes {
     | '/atendimentos/$id/editar'
     | '/atividades/$id/editar'
     | '/atividades/$id/relatorio'
+    | '/atividades/$id/relatorio-mensal'
     | '/contatos/$id/editar'
     | '/editais/$id/editar'
     | '/grupos/$id/editar'
@@ -393,6 +404,7 @@ export interface FileRouteTypes {
     | '/atendimentos/$id/editar'
     | '/atividades/$id/editar'
     | '/atividades/$id/relatorio'
+    | '/atividades/$id/relatorio-mensal'
     | '/contatos/$id/editar'
     | '/editais/$id/editar'
     | '/grupos/$id/editar'
@@ -430,6 +442,7 @@ export interface FileRouteTypes {
     | '/_app/atendimentos/$id/editar'
     | '/_app/atividades/$id/editar'
     | '/_app/atividades/$id/relatorio'
+    | '/_app/atividades/$id/relatorio-mensal'
     | '/_app/contatos/$id/editar'
     | '/_app/editais/$id/editar'
     | '/_app/grupos/$id/editar'
@@ -668,6 +681,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppContatosIdEditarRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/atividades/$id/relatorio-mensal': {
+      id: '/_app/atividades/$id/relatorio-mensal'
+      path: '/atividades/$id/relatorio-mensal'
+      fullPath: '/atividades/$id/relatorio-mensal'
+      preLoaderRoute: typeof AppAtividadesIdRelatorioMensalRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/atividades/$id/relatorio': {
       id: '/_app/atividades/$id/relatorio'
       path: '/atividades/$id/relatorio'
@@ -721,6 +741,7 @@ interface AppRouteChildren {
   AppAtendimentosIdEditarRoute: typeof AppAtendimentosIdEditarRoute
   AppAtividadesIdEditarRoute: typeof AppAtividadesIdEditarRoute
   AppAtividadesIdRelatorioRoute: typeof AppAtividadesIdRelatorioRoute
+  AppAtividadesIdRelatorioMensalRoute: typeof AppAtividadesIdRelatorioMensalRoute
   AppContatosIdEditarRoute: typeof AppContatosIdEditarRoute
   AppEditaisIdEditarRoute: typeof AppEditaisIdEditarRoute
   AppGruposIdEditarRoute: typeof AppGruposIdEditarRoute
@@ -756,6 +777,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppAtendimentosIdEditarRoute: AppAtendimentosIdEditarRoute,
   AppAtividadesIdEditarRoute: AppAtividadesIdEditarRoute,
   AppAtividadesIdRelatorioRoute: AppAtividadesIdRelatorioRoute,
+  AppAtividadesIdRelatorioMensalRoute: AppAtividadesIdRelatorioMensalRoute,
   AppContatosIdEditarRoute: AppContatosIdEditarRoute,
   AppEditaisIdEditarRoute: AppEditaisIdEditarRoute,
   AppGruposIdEditarRoute: AppGruposIdEditarRoute,

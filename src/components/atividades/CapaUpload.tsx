@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ImagePlus, X, Camera } from "lucide-react";
 import { toast } from "sonner";
+import { compressImage } from "@/lib/imageCompression";
 
 interface Props {
   atividadeId: string;
@@ -19,9 +20,13 @@ export function CapaUpload({ atividadeId, fotoUrl, legenda, canEdit, onChange }:
   const ref = useRef<HTMLInputElement>(null);
 
   async function upload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const original = e.target.files?.[0];
+    if (!original) return;
     setBusy(true);
+    const tid = toast.loading("Otimizando imagem antes do envio...");
+    let file: File = original;
+    try { file = await compressImage(original, { maxSize: 1920, quality: 0.85 }); } catch { /* segue */ }
+    toast.dismiss(tid);
     const path = `${atividadeId}/capa-${Date.now()}-${file.name}`;
     const { error } = await supabase.storage.from("fotos").upload(path, file, { upsert: true });
     if (error) { toast.error(error.message); setBusy(false); return; }
