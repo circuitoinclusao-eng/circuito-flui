@@ -14,6 +14,7 @@ import { ATENDIDO_STATUS, calcularIdade, hideCPF, maskCPF, statusClass, statusLa
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { ImportarAtendidosDialog } from "@/components/atendidos/ImportarAtendidosDialog";
+import { SignedImage } from "@/components/SignedImage";
 
 export const Route = createFileRoute("/_app/atendidos/")({ component: ListaAtendidos });
 
