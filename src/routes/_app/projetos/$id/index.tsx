@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/Cards";
+import { RelatorioMonitoramentoDialog } from "@/components/projetos/RelatorioMonitoramentoDialog";
 
 export const Route = createFileRoute("/_app/projetos/$id/")({
   component: View,
@@ -12,6 +13,7 @@ function View() {
   const { id } = Route.useParams();
   const [r, setR] = useState<any>(null);
   const [ativ, setAtiv] = useState<any[]>([]);
+  const [relOpen, setRelOpen] = useState(false);
 
   useEffect(() => {
     supabase.from("projetos").select("*").eq("id", id).maybeSingle().then(({ data }) => setR(data));
@@ -26,6 +28,7 @@ function View() {
         <h1 className="text-2xl md:text-3xl font-semibold">{r.titulo}</h1>
         <div className="flex gap-2 items-center">
           <StatusBadge status={r.status} />
+          <Button variant="outline" size="sm" onClick={() => setRelOpen(true)}>Emitir relatório de monitoramento</Button>
           <Button asChild variant="outline" size="sm"><Link to="/projetos/$id/editar" params={{ id }}>Editar</Link></Button>
           <Button asChild size="sm"><Link to="/atividades/novo">+ Atividade</Link></Button>
         </div>
@@ -70,6 +73,12 @@ function View() {
           </ul>
         )}
       </div>
+      <RelatorioMonitoramentoDialog
+        open={relOpen}
+        onClose={() => setRelOpen(false)}
+        projetoId={id}
+        projetoNome={r.titulo}
+      />
     </>
   );
 }
