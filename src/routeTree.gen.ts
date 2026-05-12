@@ -14,12 +14,14 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppInicioRouteImport } from './routes/_app/inicio'
+import { Route as AppBussolaRouteImport } from './routes/_app/bussola'
 import { Route as AppRelatoriosIndexRouteImport } from './routes/_app/relatorios/index'
 import { Route as AppProjetosIndexRouteImport } from './routes/_app/projetos/index'
 import { Route as AppGruposIndexRouteImport } from './routes/_app/grupos/index'
 import { Route as AppEditaisIndexRouteImport } from './routes/_app/editais/index'
 import { Route as AppContatosIndexRouteImport } from './routes/_app/contatos/index'
 import { Route as AppConfiguracoesIndexRouteImport } from './routes/_app/configuracoes/index'
+import { Route as AppBussolaIndexRouteImport } from './routes/_app/bussola/index'
 import { Route as AppAtividadesIndexRouteImport } from './routes/_app/atividades/index'
 import { Route as AppAtendimentosIndexRouteImport } from './routes/_app/atendimentos/index'
 import { Route as AppAtendidosIndexRouteImport } from './routes/_app/atendidos/index'
@@ -27,6 +29,9 @@ import { Route as AppProjetosNovoRouteImport } from './routes/_app/projetos/novo
 import { Route as AppGruposNovoRouteImport } from './routes/_app/grupos/novo'
 import { Route as AppEditaisNovoRouteImport } from './routes/_app/editais/novo'
 import { Route as AppContatosNovoRouteImport } from './routes/_app/contatos/novo'
+import { Route as AppBussolaRelatoriosRouteImport } from './routes/_app/bussola/relatorios'
+import { Route as AppBussolaImportarRouteImport } from './routes/_app/bussola/importar'
+import { Route as AppBussolaAdminRouteImport } from './routes/_app/bussola/admin'
 import { Route as AppAtividadesNovoRouteImport } from './routes/_app/atividades/novo'
 import { Route as AppAtendimentosNovoRouteImport } from './routes/_app/atendimentos/novo'
 import { Route as AppAtendidosNovoRouteImport } from './routes/_app/atendidos/novo'
@@ -37,6 +42,7 @@ import { Route as AppContatosIdIndexRouteImport } from './routes/_app/contatos/$
 import { Route as AppAtividadesIdIndexRouteImport } from './routes/_app/atividades/$id/index'
 import { Route as AppAtendimentosIdIndexRouteImport } from './routes/_app/atendimentos/$id/index'
 import { Route as AppAtendidosIdIndexRouteImport } from './routes/_app/atendidos/$id/index'
+import { Route as AppProjetosIdRelatorioMonitoramentoRouteImport } from './routes/_app/projetos/$id/relatorio-monitoramento'
 import { Route as AppProjetosIdEditarRouteImport } from './routes/_app/projetos/$id/editar'
 import { Route as AppGruposIdEditarRouteImport } from './routes/_app/grupos/$id/editar'
 import { Route as AppEditaisIdEditarRouteImport } from './routes/_app/editais/$id/editar'
@@ -71,6 +77,11 @@ const AppInicioRoute = AppInicioRouteImport.update({
   path: '/inicio',
   getParentRoute: () => AppRoute,
 } as any)
+const AppBussolaRoute = AppBussolaRouteImport.update({
+  id: '/bussola',
+  path: '/bussola',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppRelatoriosIndexRoute = AppRelatoriosIndexRouteImport.update({
   id: '/relatorios/',
   path: '/relatorios/',
@@ -100,6 +111,11 @@ const AppConfiguracoesIndexRoute = AppConfiguracoesIndexRouteImport.update({
   id: '/configuracoes/',
   path: '/configuracoes/',
   getParentRoute: () => AppRoute,
+} as any)
+const AppBussolaIndexRoute = AppBussolaIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppBussolaRoute,
 } as any)
 const AppAtividadesIndexRoute = AppAtividadesIndexRouteImport.update({
   id: '/atividades/',
@@ -135,6 +151,21 @@ const AppContatosNovoRoute = AppContatosNovoRouteImport.update({
   id: '/contatos/novo',
   path: '/contatos/novo',
   getParentRoute: () => AppRoute,
+} as any)
+const AppBussolaRelatoriosRoute = AppBussolaRelatoriosRouteImport.update({
+  id: '/relatorios',
+  path: '/relatorios',
+  getParentRoute: () => AppBussolaRoute,
+} as any)
+const AppBussolaImportarRoute = AppBussolaImportarRouteImport.update({
+  id: '/importar',
+  path: '/importar',
+  getParentRoute: () => AppBussolaRoute,
+} as any)
+const AppBussolaAdminRoute = AppBussolaAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AppBussolaRoute,
 } as any)
 const AppAtividadesNovoRoute = AppAtividadesNovoRouteImport.update({
   id: '/atividades/novo',
@@ -186,6 +217,12 @@ const AppAtendidosIdIndexRoute = AppAtendidosIdIndexRouteImport.update({
   path: '/atendidos/$id/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppProjetosIdRelatorioMonitoramentoRoute =
+  AppProjetosIdRelatorioMonitoramentoRouteImport.update({
+    id: '/projetos/$id/relatorio-monitoramento',
+    path: '/projetos/$id/relatorio-monitoramento',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppProjetosIdEditarRoute = AppProjetosIdEditarRouteImport.update({
   id: '/projetos/$id/editar',
   path: '/projetos/$id/editar',
@@ -238,10 +275,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/download': typeof DownloadRoute
+  '/bussola': typeof AppBussolaRouteWithChildren
   '/inicio': typeof AppInicioRoute
   '/atendidos/novo': typeof AppAtendidosNovoRoute
   '/atendimentos/novo': typeof AppAtendimentosNovoRoute
   '/atividades/novo': typeof AppAtividadesNovoRoute
+  '/bussola/admin': typeof AppBussolaAdminRoute
+  '/bussola/importar': typeof AppBussolaImportarRoute
+  '/bussola/relatorios': typeof AppBussolaRelatoriosRoute
   '/contatos/novo': typeof AppContatosNovoRoute
   '/editais/novo': typeof AppEditaisNovoRoute
   '/grupos/novo': typeof AppGruposNovoRoute
@@ -249,6 +290,7 @@ export interface FileRoutesByFullPath {
   '/atendidos/': typeof AppAtendidosIndexRoute
   '/atendimentos/': typeof AppAtendimentosIndexRoute
   '/atividades/': typeof AppAtividadesIndexRoute
+  '/bussola/': typeof AppBussolaIndexRoute
   '/configuracoes/': typeof AppConfiguracoesIndexRoute
   '/contatos/': typeof AppContatosIndexRoute
   '/editais/': typeof AppEditaisIndexRoute
@@ -264,6 +306,7 @@ export interface FileRoutesByFullPath {
   '/editais/$id/editar': typeof AppEditaisIdEditarRoute
   '/grupos/$id/editar': typeof AppGruposIdEditarRoute
   '/projetos/$id/editar': typeof AppProjetosIdEditarRoute
+  '/projetos/$id/relatorio-monitoramento': typeof AppProjetosIdRelatorioMonitoramentoRoute
   '/atendidos/$id/': typeof AppAtendidosIdIndexRoute
   '/atendimentos/$id/': typeof AppAtendimentosIdIndexRoute
   '/atividades/$id/': typeof AppAtividadesIdIndexRoute
@@ -280,6 +323,9 @@ export interface FileRoutesByTo {
   '/atendidos/novo': typeof AppAtendidosNovoRoute
   '/atendimentos/novo': typeof AppAtendimentosNovoRoute
   '/atividades/novo': typeof AppAtividadesNovoRoute
+  '/bussola/admin': typeof AppBussolaAdminRoute
+  '/bussola/importar': typeof AppBussolaImportarRoute
+  '/bussola/relatorios': typeof AppBussolaRelatoriosRoute
   '/contatos/novo': typeof AppContatosNovoRoute
   '/editais/novo': typeof AppEditaisNovoRoute
   '/grupos/novo': typeof AppGruposNovoRoute
@@ -287,6 +333,7 @@ export interface FileRoutesByTo {
   '/atendidos': typeof AppAtendidosIndexRoute
   '/atendimentos': typeof AppAtendimentosIndexRoute
   '/atividades': typeof AppAtividadesIndexRoute
+  '/bussola': typeof AppBussolaIndexRoute
   '/configuracoes': typeof AppConfiguracoesIndexRoute
   '/contatos': typeof AppContatosIndexRoute
   '/editais': typeof AppEditaisIndexRoute
@@ -302,6 +349,7 @@ export interface FileRoutesByTo {
   '/editais/$id/editar': typeof AppEditaisIdEditarRoute
   '/grupos/$id/editar': typeof AppGruposIdEditarRoute
   '/projetos/$id/editar': typeof AppProjetosIdEditarRoute
+  '/projetos/$id/relatorio-monitoramento': typeof AppProjetosIdRelatorioMonitoramentoRoute
   '/atendidos/$id': typeof AppAtendidosIdIndexRoute
   '/atendimentos/$id': typeof AppAtendimentosIdIndexRoute
   '/atividades/$id': typeof AppAtividadesIdIndexRoute
@@ -316,10 +364,14 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/download': typeof DownloadRoute
+  '/_app/bussola': typeof AppBussolaRouteWithChildren
   '/_app/inicio': typeof AppInicioRoute
   '/_app/atendidos/novo': typeof AppAtendidosNovoRoute
   '/_app/atendimentos/novo': typeof AppAtendimentosNovoRoute
   '/_app/atividades/novo': typeof AppAtividadesNovoRoute
+  '/_app/bussola/admin': typeof AppBussolaAdminRoute
+  '/_app/bussola/importar': typeof AppBussolaImportarRoute
+  '/_app/bussola/relatorios': typeof AppBussolaRelatoriosRoute
   '/_app/contatos/novo': typeof AppContatosNovoRoute
   '/_app/editais/novo': typeof AppEditaisNovoRoute
   '/_app/grupos/novo': typeof AppGruposNovoRoute
@@ -327,6 +379,7 @@ export interface FileRoutesById {
   '/_app/atendidos/': typeof AppAtendidosIndexRoute
   '/_app/atendimentos/': typeof AppAtendimentosIndexRoute
   '/_app/atividades/': typeof AppAtividadesIndexRoute
+  '/_app/bussola/': typeof AppBussolaIndexRoute
   '/_app/configuracoes/': typeof AppConfiguracoesIndexRoute
   '/_app/contatos/': typeof AppContatosIndexRoute
   '/_app/editais/': typeof AppEditaisIndexRoute
@@ -342,6 +395,7 @@ export interface FileRoutesById {
   '/_app/editais/$id/editar': typeof AppEditaisIdEditarRoute
   '/_app/grupos/$id/editar': typeof AppGruposIdEditarRoute
   '/_app/projetos/$id/editar': typeof AppProjetosIdEditarRoute
+  '/_app/projetos/$id/relatorio-monitoramento': typeof AppProjetosIdRelatorioMonitoramentoRoute
   '/_app/atendidos/$id/': typeof AppAtendidosIdIndexRoute
   '/_app/atendimentos/$id/': typeof AppAtendimentosIdIndexRoute
   '/_app/atividades/$id/': typeof AppAtividadesIdIndexRoute
@@ -356,10 +410,14 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/download'
+    | '/bussola'
     | '/inicio'
     | '/atendidos/novo'
     | '/atendimentos/novo'
     | '/atividades/novo'
+    | '/bussola/admin'
+    | '/bussola/importar'
+    | '/bussola/relatorios'
     | '/contatos/novo'
     | '/editais/novo'
     | '/grupos/novo'
@@ -367,6 +425,7 @@ export interface FileRouteTypes {
     | '/atendidos/'
     | '/atendimentos/'
     | '/atividades/'
+    | '/bussola/'
     | '/configuracoes/'
     | '/contatos/'
     | '/editais/'
@@ -382,6 +441,7 @@ export interface FileRouteTypes {
     | '/editais/$id/editar'
     | '/grupos/$id/editar'
     | '/projetos/$id/editar'
+    | '/projetos/$id/relatorio-monitoramento'
     | '/atendidos/$id/'
     | '/atendimentos/$id/'
     | '/atividades/$id/'
@@ -398,6 +458,9 @@ export interface FileRouteTypes {
     | '/atendidos/novo'
     | '/atendimentos/novo'
     | '/atividades/novo'
+    | '/bussola/admin'
+    | '/bussola/importar'
+    | '/bussola/relatorios'
     | '/contatos/novo'
     | '/editais/novo'
     | '/grupos/novo'
@@ -405,6 +468,7 @@ export interface FileRouteTypes {
     | '/atendidos'
     | '/atendimentos'
     | '/atividades'
+    | '/bussola'
     | '/configuracoes'
     | '/contatos'
     | '/editais'
@@ -420,6 +484,7 @@ export interface FileRouteTypes {
     | '/editais/$id/editar'
     | '/grupos/$id/editar'
     | '/projetos/$id/editar'
+    | '/projetos/$id/relatorio-monitoramento'
     | '/atendidos/$id'
     | '/atendimentos/$id'
     | '/atividades/$id'
@@ -433,10 +498,14 @@ export interface FileRouteTypes {
     | '/_app'
     | '/auth'
     | '/download'
+    | '/_app/bussola'
     | '/_app/inicio'
     | '/_app/atendidos/novo'
     | '/_app/atendimentos/novo'
     | '/_app/atividades/novo'
+    | '/_app/bussola/admin'
+    | '/_app/bussola/importar'
+    | '/_app/bussola/relatorios'
     | '/_app/contatos/novo'
     | '/_app/editais/novo'
     | '/_app/grupos/novo'
@@ -444,6 +513,7 @@ export interface FileRouteTypes {
     | '/_app/atendidos/'
     | '/_app/atendimentos/'
     | '/_app/atividades/'
+    | '/_app/bussola/'
     | '/_app/configuracoes/'
     | '/_app/contatos/'
     | '/_app/editais/'
@@ -459,6 +529,7 @@ export interface FileRouteTypes {
     | '/_app/editais/$id/editar'
     | '/_app/grupos/$id/editar'
     | '/_app/projetos/$id/editar'
+    | '/_app/projetos/$id/relatorio-monitoramento'
     | '/_app/atendidos/$id/'
     | '/_app/atendimentos/$id/'
     | '/_app/atividades/$id/'
@@ -512,6 +583,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppInicioRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/bussola': {
+      id: '/_app/bussola'
+      path: '/bussola'
+      fullPath: '/bussola'
+      preLoaderRoute: typeof AppBussolaRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/relatorios/': {
       id: '/_app/relatorios/'
       path: '/relatorios'
@@ -553,6 +631,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/configuracoes/'
       preLoaderRoute: typeof AppConfiguracoesIndexRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/_app/bussola/': {
+      id: '/_app/bussola/'
+      path: '/'
+      fullPath: '/bussola/'
+      preLoaderRoute: typeof AppBussolaIndexRouteImport
+      parentRoute: typeof AppBussolaRoute
     }
     '/_app/atividades/': {
       id: '/_app/atividades/'
@@ -602,6 +687,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/contatos/novo'
       preLoaderRoute: typeof AppContatosNovoRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/_app/bussola/relatorios': {
+      id: '/_app/bussola/relatorios'
+      path: '/relatorios'
+      fullPath: '/bussola/relatorios'
+      preLoaderRoute: typeof AppBussolaRelatoriosRouteImport
+      parentRoute: typeof AppBussolaRoute
+    }
+    '/_app/bussola/importar': {
+      id: '/_app/bussola/importar'
+      path: '/importar'
+      fullPath: '/bussola/importar'
+      preLoaderRoute: typeof AppBussolaImportarRouteImport
+      parentRoute: typeof AppBussolaRoute
+    }
+    '/_app/bussola/admin': {
+      id: '/_app/bussola/admin'
+      path: '/admin'
+      fullPath: '/bussola/admin'
+      preLoaderRoute: typeof AppBussolaAdminRouteImport
+      parentRoute: typeof AppBussolaRoute
     }
     '/_app/atividades/novo': {
       id: '/_app/atividades/novo'
@@ -673,6 +779,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAtendidosIdIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/projetos/$id/relatorio-monitoramento': {
+      id: '/_app/projetos/$id/relatorio-monitoramento'
+      path: '/projetos/$id/relatorio-monitoramento'
+      fullPath: '/projetos/$id/relatorio-monitoramento'
+      preLoaderRoute: typeof AppProjetosIdRelatorioMonitoramentoRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/projetos/$id/editar': {
       id: '/_app/projetos/$id/editar'
       path: '/projetos/$id/editar'
@@ -739,7 +852,26 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AppBussolaRouteChildren {
+  AppBussolaAdminRoute: typeof AppBussolaAdminRoute
+  AppBussolaImportarRoute: typeof AppBussolaImportarRoute
+  AppBussolaRelatoriosRoute: typeof AppBussolaRelatoriosRoute
+  AppBussolaIndexRoute: typeof AppBussolaIndexRoute
+}
+
+const AppBussolaRouteChildren: AppBussolaRouteChildren = {
+  AppBussolaAdminRoute: AppBussolaAdminRoute,
+  AppBussolaImportarRoute: AppBussolaImportarRoute,
+  AppBussolaRelatoriosRoute: AppBussolaRelatoriosRoute,
+  AppBussolaIndexRoute: AppBussolaIndexRoute,
+}
+
+const AppBussolaRouteWithChildren = AppBussolaRoute._addFileChildren(
+  AppBussolaRouteChildren,
+)
+
 interface AppRouteChildren {
+  AppBussolaRoute: typeof AppBussolaRouteWithChildren
   AppInicioRoute: typeof AppInicioRoute
   AppAtendidosNovoRoute: typeof AppAtendidosNovoRoute
   AppAtendimentosNovoRoute: typeof AppAtendimentosNovoRoute
@@ -766,6 +898,7 @@ interface AppRouteChildren {
   AppEditaisIdEditarRoute: typeof AppEditaisIdEditarRoute
   AppGruposIdEditarRoute: typeof AppGruposIdEditarRoute
   AppProjetosIdEditarRoute: typeof AppProjetosIdEditarRoute
+  AppProjetosIdRelatorioMonitoramentoRoute: typeof AppProjetosIdRelatorioMonitoramentoRoute
   AppAtendidosIdIndexRoute: typeof AppAtendidosIdIndexRoute
   AppAtendimentosIdIndexRoute: typeof AppAtendimentosIdIndexRoute
   AppAtividadesIdIndexRoute: typeof AppAtividadesIdIndexRoute
@@ -776,6 +909,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppBussolaRoute: AppBussolaRouteWithChildren,
   AppInicioRoute: AppInicioRoute,
   AppAtendidosNovoRoute: AppAtendidosNovoRoute,
   AppAtendimentosNovoRoute: AppAtendimentosNovoRoute,
@@ -802,6 +936,8 @@ const AppRouteChildren: AppRouteChildren = {
   AppEditaisIdEditarRoute: AppEditaisIdEditarRoute,
   AppGruposIdEditarRoute: AppGruposIdEditarRoute,
   AppProjetosIdEditarRoute: AppProjetosIdEditarRoute,
+  AppProjetosIdRelatorioMonitoramentoRoute:
+    AppProjetosIdRelatorioMonitoramentoRoute,
   AppAtendidosIdIndexRoute: AppAtendidosIdIndexRoute,
   AppAtendimentosIdIndexRoute: AppAtendimentosIdIndexRoute,
   AppAtividadesIdIndexRoute: AppAtividadesIdIndexRoute,
