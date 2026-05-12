@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as DownloadRouteImport } from './routes/download'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
@@ -46,6 +47,11 @@ import { Route as AppAtividadesIdEditarRouteImport } from './routes/_app/ativida
 import { Route as AppAtendimentosIdEditarRouteImport } from './routes/_app/atendimentos/$id/editar'
 import { Route as AppAtendidosIdEditarRouteImport } from './routes/_app/atendidos/$id/editar'
 
+const DownloadRoute = DownloadRouteImport.update({
+  id: '/download',
+  path: '/download',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -231,6 +237,7 @@ const AppAtendidosIdEditarRoute = AppAtendidosIdEditarRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/download': typeof DownloadRoute
   '/inicio': typeof AppInicioRoute
   '/atendidos/novo': typeof AppAtendidosNovoRoute
   '/atendimentos/novo': typeof AppAtendimentosNovoRoute
@@ -268,6 +275,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/download': typeof DownloadRoute
   '/inicio': typeof AppInicioRoute
   '/atendidos/novo': typeof AppAtendidosNovoRoute
   '/atendimentos/novo': typeof AppAtendimentosNovoRoute
@@ -307,6 +315,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/download': typeof DownloadRoute
   '/_app/inicio': typeof AppInicioRoute
   '/_app/atendidos/novo': typeof AppAtendidosNovoRoute
   '/_app/atendimentos/novo': typeof AppAtendimentosNovoRoute
@@ -346,6 +355,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/download'
     | '/inicio'
     | '/atendidos/novo'
     | '/atendimentos/novo'
@@ -383,6 +393,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/download'
     | '/inicio'
     | '/atendidos/novo'
     | '/atendimentos/novo'
@@ -421,6 +432,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_app'
     | '/auth'
+    | '/download'
     | '/_app/inicio'
     | '/_app/atendidos/novo'
     | '/_app/atendimentos/novo'
@@ -460,10 +472,18 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
+  DownloadRoute: typeof DownloadRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/download': {
+      id: '/download'
+      path: '/download'
+      fullPath: '/download'
+      preLoaderRoute: typeof DownloadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -797,6 +817,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
+  DownloadRoute: DownloadRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
