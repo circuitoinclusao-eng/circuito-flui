@@ -558,6 +558,36 @@ export type Database = {
           },
         ]
       }
+      audit_log: {
+        Row: {
+          acao: string
+          actor_id: string | null
+          created_at: string
+          detalhes: Json | null
+          entidade: string | null
+          entidade_id: string | null
+          id: string
+        }
+        Insert: {
+          acao: string
+          actor_id?: string | null
+          created_at?: string
+          detalhes?: Json | null
+          entidade?: string | null
+          entidade_id?: string | null
+          id?: string
+        }
+        Update: {
+          acao?: string
+          actor_id?: string | null
+          created_at?: string
+          detalhes?: Json | null
+          entidade?: string | null
+          entidade_id?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
       contatos: {
         Row: {
           cidade: string | null
@@ -1037,6 +1067,7 @@ export type Database = {
           email: string
           id: string
           nome: string
+          status: string
         }
         Insert: {
           ativo?: boolean
@@ -1044,6 +1075,7 @@ export type Database = {
           email: string
           id: string
           nome: string
+          status?: string
         }
         Update: {
           ativo?: boolean
@@ -1051,6 +1083,7 @@ export type Database = {
           email?: string
           id?: string
           nome?: string
+          status?: string
         }
         Relationships: []
       }
@@ -1442,6 +1475,7 @@ export type Database = {
         Returns: boolean
       }
       is_admin_or_coord: { Args: { _user_id: string }; Returns: boolean }
+      is_approved: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role:
