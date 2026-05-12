@@ -160,13 +160,15 @@ function AddInscritoDialog({ open, onClose, atividadeId, existentes, reload }: a
   }, [q, open]);
 
   async function add(at: any) {
-    if (existentes.has(at.id)) {
-      await supabase.from("atividade_inscritos").update({ status: statusInsc }).eq("atividade_id", atividadeId).eq("atendido_id", at.id);
-    } else {
-      const { error } = await supabase.from("atividade_inscritos").insert({
-        atividade_id: atividadeId, atendido_id: at.id, status: statusInsc,
-      });
-      if (error) { toast.error(error.message); return; }
+    const { error } = await supabase.from("atividade_inscritos").upsert({
+      atividade_id: atividadeId,
+      atendido_id: at.id,
+      status: statusInsc,
+      data_inscricao: new Date().toISOString().slice(0, 10),
+    }, { onConflict: "atividade_id,atendido_id" });
+    if (error) {
+      toast.error(error.message);
+      return;
     }
     toast.success(`${at.nome} adicionado(a).`);
     reload();
