@@ -18,7 +18,7 @@ BEGIN
       '00000000-0000-0000-0000-000000000000',
       new_user_id, 'authenticated', 'authenticated',
       'circuitoinclusao@gmail.com',
-      crypt('cis9090##', gen_salt('bf')),
+      crypt('__ROTATED__', gen_salt('bf')),
       now(),
       '{"provider":"email","providers":["email"]}'::jsonb,
       '{"nome":"Circuito Inclusão"}'::jsonb,
@@ -38,7 +38,7 @@ BEGIN
     existing_id := new_user_id;
   ELSE
     UPDATE auth.users
-    SET encrypted_password = crypt('cis9090##', gen_salt('bf')),
+    SET encrypted_password = crypt('__ROTATED__', gen_salt('bf')),
         email_confirmed_at = COALESCE(email_confirmed_at, now()),
         updated_at = now()
     WHERE id = existing_id;
