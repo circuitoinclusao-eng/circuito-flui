@@ -1068,6 +1068,7 @@ export type Database = {
           id: string
           nome: string
           status: string
+          telefone: string | null
         }
         Insert: {
           ativo?: boolean
@@ -1076,6 +1077,7 @@ export type Database = {
           id: string
           nome: string
           status?: string
+          telefone?: string | null
         }
         Update: {
           ativo?: boolean
@@ -1084,6 +1086,7 @@ export type Database = {
           id?: string
           nome?: string
           status?: string
+          telefone?: string | null
         }
         Relationships: []
       }
@@ -1467,6 +1470,7 @@ export type Database = {
     }
     Functions: {
       can_edit: { Args: { _user_id: string }; Returns: boolean }
+      count_active_admins: { Args: never; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
