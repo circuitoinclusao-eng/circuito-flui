@@ -97,23 +97,37 @@ function parseCSV(text: string, delim: string): string[][] {
   return rows.filter((r) => r.some((c) => String(c).trim() !== ""));
 }
 
-// Detect which row is the real header: scoring rows by how many cells map to known aliases
+// Detect which row is the real header: prefer the row with the most ALIAS hits.
+// Skip title rows (e.g. "Dados pessoais") that are merged across the columns
+// or that have only one filled cell.
 function detectHeaderRow(allRows: any[][]): number {
-  const maxScan = Math.min(allRows.length, 10);
-  let bestIdx = 0, bestScore = -1;
+  const maxScan = Math.min(allRows.length, 15);
+  let bestIdx = -1, bestAlias = 0, bestScore = -1;
   for (let i = 0; i < maxScan; i++) {
-    const row = allRows[i];
-    const nonEmpty = row.filter((c) => String(c ?? "").trim() !== "").length;
-    if (nonEmpty < 2) continue; // skip title rows like "Dados pessoais"
-    let score = 0;
+    const row = allRows[i] ?? [];
+    const filled = row.map((c) => String(c ?? "").trim()).filter((c) => c !== "");
+    if (filled.length < 2) continue;
+    // Skip title-like rows where every filled cell is identical (merged title).
+    const uniq = new Set(filled.map((c) => c.toLowerCase()));
+    if (uniq.size === 1) continue;
+    let aliasHits = 0, score = 0;
     for (const c of row) {
       const k = norm(c);
       if (!k) continue;
-      if (ALIAS[k]) score += 2;
-      // also reward cells that look like field names (short, all text, no digits)
+      if (ALIAS[k]) { aliasHits++; score += 2; }
       else if (k.length > 1 && k.length < 40 && !/^\d+$/.test(k)) score += 0.2;
     }
-    if (score > bestScore) { bestScore = score; bestIdx = i; }
+    if (aliasHits > bestAlias || (aliasHits === bestAlias && score > bestScore)) {
+      bestAlias = aliasHits; bestScore = score; bestIdx = i;
+    }
+  }
+  if (bestIdx === -1) {
+    // Fallback: first row with 2+ filled cells.
+    for (let i = 0; i < allRows.length; i++) {
+      const filled = (allRows[i] ?? []).filter((c) => String(c ?? "").trim() !== "").length;
+      if (filled >= 2) return i;
+    }
+    return 0;
   }
   return bestIdx;
 }
