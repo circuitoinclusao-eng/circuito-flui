@@ -14,6 +14,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppInicioRouteImport } from './routes/_app/inicio'
+import { Route as AppBussolaRouteImport } from './routes/_app/bussola'
 import { Route as AppRelatoriosIndexRouteImport } from './routes/_app/relatorios/index'
 import { Route as AppProjetosIndexRouteImport } from './routes/_app/projetos/index'
 import { Route as AppGruposIndexRouteImport } from './routes/_app/grupos/index'
@@ -70,6 +71,11 @@ const IndexRoute = IndexRouteImport.update({
 const AppInicioRoute = AppInicioRouteImport.update({
   id: '/inicio',
   path: '/inicio',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppBussolaRoute = AppBussolaRouteImport.update({
+  id: '/bussola',
+  path: '/bussola',
   getParentRoute: () => AppRoute,
 } as any)
 const AppRelatoriosIndexRoute = AppRelatoriosIndexRouteImport.update({
@@ -245,6 +251,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/download': typeof DownloadRoute
+  '/bussola': typeof AppBussolaRoute
   '/inicio': typeof AppInicioRoute
   '/atendidos/novo': typeof AppAtendidosNovoRoute
   '/atendimentos/novo': typeof AppAtendimentosNovoRoute
@@ -284,6 +291,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/download': typeof DownloadRoute
+  '/bussola': typeof AppBussolaRoute
   '/inicio': typeof AppInicioRoute
   '/atendidos/novo': typeof AppAtendidosNovoRoute
   '/atendimentos/novo': typeof AppAtendimentosNovoRoute
@@ -325,6 +333,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/download': typeof DownloadRoute
+  '/_app/bussola': typeof AppBussolaRoute
   '/_app/inicio': typeof AppInicioRoute
   '/_app/atendidos/novo': typeof AppAtendidosNovoRoute
   '/_app/atendimentos/novo': typeof AppAtendimentosNovoRoute
@@ -366,6 +375,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/download'
+    | '/bussola'
     | '/inicio'
     | '/atendidos/novo'
     | '/atendimentos/novo'
@@ -405,6 +415,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/download'
+    | '/bussola'
     | '/inicio'
     | '/atendidos/novo'
     | '/atendimentos/novo'
@@ -445,6 +456,7 @@ export interface FileRouteTypes {
     | '/_app'
     | '/auth'
     | '/download'
+    | '/_app/bussola'
     | '/_app/inicio'
     | '/_app/atendidos/novo'
     | '/_app/atendimentos/novo'
@@ -523,6 +535,13 @@ declare module '@tanstack/react-router' {
       path: '/inicio'
       fullPath: '/inicio'
       preLoaderRoute: typeof AppInicioRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/bussola': {
+      id: '/_app/bussola'
+      path: '/bussola'
+      fullPath: '/bussola'
+      preLoaderRoute: typeof AppBussolaRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/relatorios/': {
@@ -760,6 +779,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteChildren {
+  AppBussolaRoute: typeof AppBussolaRoute
   AppInicioRoute: typeof AppInicioRoute
   AppAtendidosNovoRoute: typeof AppAtendidosNovoRoute
   AppAtendimentosNovoRoute: typeof AppAtendimentosNovoRoute
@@ -797,6 +817,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppBussolaRoute: AppBussolaRoute,
   AppInicioRoute: AppInicioRoute,
   AppAtendidosNovoRoute: AppAtendidosNovoRoute,
   AppAtendimentosNovoRoute: AppAtendimentosNovoRoute,
