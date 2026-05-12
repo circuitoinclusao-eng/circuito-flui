@@ -13,7 +13,6 @@ import { Plus, FileDown, Filter, Eye, EyeOff, Search, MoreVertical, Tag, Users a
 import { ATENDIDO_STATUS, calcularIdade, hideCPF, maskCPF, statusClass, statusLabel, MARCADORES_PADRAO } from "@/lib/atendidos";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
-import { ImportarAtendidosDialog } from "@/components/atendidos/ImportarAtendidosDialog";
 
 export const Route = createFileRoute("/_app/atendidos/")({ component: ListaAtendidos });
 
@@ -47,10 +46,15 @@ function ListaAtendidos() {
   const [cols, setCols] = useState<string[]>(["foto", "nome", "status", "matricula_familia", "idade", "cpf", "telefone", "cidade", "projeto"]);
   const [projetos, setProjetos] = useState<any[]>([]);
   const [grupos, setGrupos] = useState<any[]>([]);
-  const [importOpen, setImportOpen] = useState(false);
 
   async function load() {
-    const { data } = await supabase.from("atendidos").select("*").order("nome");
+    const { data, error } = await supabase.from("atendidos").select("*").order("nome");
+    if (error) {
+      console.error("Erro ao carregar atendidos:", error);
+      toast.error("Não foi possível carregar os atendidos.");
+      setRows([]);
+      return;
+    }
     setRows(data ?? []);
     const ids = (data ?? []).map((r) => r.id);
     if (ids.length) {
@@ -174,8 +178,10 @@ function ListaAtendidos() {
           {canEdit && <Button asChild><Link to="/atendidos/novo"><Plus className="w-4 h-4 mr-1" /> Novo Atendido</Link></Button>}
           <Button variant="outline" onClick={exportCSV}><FileDown className="w-4 h-4 mr-1" /> Exportar</Button>
           {canEdit && (
-            <Button variant="outline" onClick={() => setImportOpen(true)}>
+            <Button variant="outline" asChild>
+              <Link to="/atendidos/importar">
               <Upload className="w-4 h-4 mr-1" /> Importar planilha
+              </Link>
             </Button>
           )}
         </div>
@@ -246,7 +252,7 @@ function ListaAtendidos() {
                 {cols.includes("nome") && <th className="p-3">Nome</th>}
                 {cols.includes("status") && <th className="p-3">Situação</th>}
                 {cols.includes("marcadores") && <th className="p-3">Marcadores</th>}
-                {cols.includes("matricula_familia") && <th className="p-3">Família</th>}
+                {cols.includes("matricula_familia") && <th className="p-3">Matrícula/Família</th>}
                 {cols.includes("data_nascimento") && <th className="p-3">Nasc.</th>}
                 {cols.includes("idade") && <th className="p-3">Idade</th>}
                 {cols.includes("cpf") && <th className="p-3">CPF</th>}
@@ -255,12 +261,16 @@ function ListaAtendidos() {
                 {cols.includes("responsavel_nome") && <th className="p-3">Responsável</th>}
                 {cols.includes("projeto") && <th className="p-3">Projeto</th>}
                 {cols.includes("grupo") && <th className="p-3">Grupo</th>}
-                <th className="p-3"></th>
+                <th className="p-3 text-right">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y">
               {filtered.length === 0 && (
-                <tr><td colSpan={cols.length + 3} className="p-8 text-center text-muted-foreground">Nenhum atendido encontrado.</td></tr>
+                <tr>
+                  <td colSpan={cols.length + 3} className="p-8 text-center text-muted-foreground">
+                    {rows.length === 0 ? "Nenhum atendido cadastrado ainda." : "Nenhum atendido encontrado."}
+                  </td>
+                </tr>
               )}
               {filtered.map((r) => (
                 <tr key={r.id} className="hover:bg-muted/30">
@@ -307,7 +317,11 @@ function ListaAtendidos() {
 
       {/* Cards (mobile) */}
       <div className="md:hidden space-y-3">
-        {filtered.length === 0 && <div className="text-center text-muted-foreground py-8">Nenhum atendido encontrado.</div>}
+        {filtered.length === 0 && (
+          <div className="text-center text-muted-foreground py-8">
+            {rows.length === 0 ? "Nenhum atendido cadastrado ainda." : "Nenhum atendido encontrado."}
+          </div>
+        )}
         {filtered.map((r) => (
           <div key={r.id} className="bg-card border rounded-xl p-4 flex gap-3">
             <Checkbox checked={sel.has(r.id)} onCheckedChange={() => toggleSel(r.id)} />
@@ -326,7 +340,6 @@ function ListaAtendidos() {
           </div>
         ))}
       </div>
-      <ImportarAtendidosDialog open={importOpen} onClose={() => setImportOpen(false)} onDone={load} />
     </>
   );
 }

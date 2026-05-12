@@ -13,14 +13,14 @@ import {
 import { Input } from "@/components/ui/input";
 
 const NAV = [
-  { to: "/", label: "Início", icon: LayoutDashboard },
+  { to: "/inicio", label: "Dashboard", icon: LayoutDashboard },
   { to: "/editais", label: "Editais", icon: FileText },
   { to: "/projetos", label: "Projetos", icon: FolderKanban },
   { to: "/atividades", label: "Atividades", icon: CalendarRange },
   { to: "/atendidos", label: "Atendidos", icon: UserCheck },
   { to: "/atendimentos", label: "Atendimentos", icon: HeartHandshake },
-  { to: "/grupos", label: "Grupos / Turmas", icon: Users },
-  { to: "/contatos", label: "Contatos", icon: Contact },
+  { to: "/grupos", label: "Grupos", icon: Users },
+  { to: "/contatos", label: "Relacionamento", icon: Contact },
   { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
   { to: "/configuracoes", label: "Configurações", icon: Settings },
 ] as const;
