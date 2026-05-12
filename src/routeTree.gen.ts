@@ -37,6 +37,7 @@ import { Route as AppContatosIdIndexRouteImport } from './routes/_app/contatos/$
 import { Route as AppAtividadesIdIndexRouteImport } from './routes/_app/atividades/$id/index'
 import { Route as AppAtendimentosIdIndexRouteImport } from './routes/_app/atendimentos/$id/index'
 import { Route as AppAtendidosIdIndexRouteImport } from './routes/_app/atendidos/$id/index'
+import { Route as AppProjetosIdRelatorioMonitoramentoRouteImport } from './routes/_app/projetos/$id/relatorio-monitoramento'
 import { Route as AppProjetosIdEditarRouteImport } from './routes/_app/projetos/$id/editar'
 import { Route as AppGruposIdEditarRouteImport } from './routes/_app/grupos/$id/editar'
 import { Route as AppEditaisIdEditarRouteImport } from './routes/_app/editais/$id/editar'
@@ -186,6 +187,12 @@ const AppAtendidosIdIndexRoute = AppAtendidosIdIndexRouteImport.update({
   path: '/atendidos/$id/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppProjetosIdRelatorioMonitoramentoRoute =
+  AppProjetosIdRelatorioMonitoramentoRouteImport.update({
+    id: '/projetos/$id/relatorio-monitoramento',
+    path: '/projetos/$id/relatorio-monitoramento',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppProjetosIdEditarRoute = AppProjetosIdEditarRouteImport.update({
   id: '/projetos/$id/editar',
   path: '/projetos/$id/editar',
@@ -264,6 +271,7 @@ export interface FileRoutesByFullPath {
   '/editais/$id/editar': typeof AppEditaisIdEditarRoute
   '/grupos/$id/editar': typeof AppGruposIdEditarRoute
   '/projetos/$id/editar': typeof AppProjetosIdEditarRoute
+  '/projetos/$id/relatorio-monitoramento': typeof AppProjetosIdRelatorioMonitoramentoRoute
   '/atendidos/$id/': typeof AppAtendidosIdIndexRoute
   '/atendimentos/$id/': typeof AppAtendimentosIdIndexRoute
   '/atividades/$id/': typeof AppAtividadesIdIndexRoute
@@ -302,6 +310,7 @@ export interface FileRoutesByTo {
   '/editais/$id/editar': typeof AppEditaisIdEditarRoute
   '/grupos/$id/editar': typeof AppGruposIdEditarRoute
   '/projetos/$id/editar': typeof AppProjetosIdEditarRoute
+  '/projetos/$id/relatorio-monitoramento': typeof AppProjetosIdRelatorioMonitoramentoRoute
   '/atendidos/$id': typeof AppAtendidosIdIndexRoute
   '/atendimentos/$id': typeof AppAtendimentosIdIndexRoute
   '/atividades/$id': typeof AppAtividadesIdIndexRoute
@@ -342,6 +351,7 @@ export interface FileRoutesById {
   '/_app/editais/$id/editar': typeof AppEditaisIdEditarRoute
   '/_app/grupos/$id/editar': typeof AppGruposIdEditarRoute
   '/_app/projetos/$id/editar': typeof AppProjetosIdEditarRoute
+  '/_app/projetos/$id/relatorio-monitoramento': typeof AppProjetosIdRelatorioMonitoramentoRoute
   '/_app/atendidos/$id/': typeof AppAtendidosIdIndexRoute
   '/_app/atendimentos/$id/': typeof AppAtendimentosIdIndexRoute
   '/_app/atividades/$id/': typeof AppAtividadesIdIndexRoute
@@ -382,6 +392,7 @@ export interface FileRouteTypes {
     | '/editais/$id/editar'
     | '/grupos/$id/editar'
     | '/projetos/$id/editar'
+    | '/projetos/$id/relatorio-monitoramento'
     | '/atendidos/$id/'
     | '/atendimentos/$id/'
     | '/atividades/$id/'
@@ -420,6 +431,7 @@ export interface FileRouteTypes {
     | '/editais/$id/editar'
     | '/grupos/$id/editar'
     | '/projetos/$id/editar'
+    | '/projetos/$id/relatorio-monitoramento'
     | '/atendidos/$id'
     | '/atendimentos/$id'
     | '/atividades/$id'
@@ -459,6 +471,7 @@ export interface FileRouteTypes {
     | '/_app/editais/$id/editar'
     | '/_app/grupos/$id/editar'
     | '/_app/projetos/$id/editar'
+    | '/_app/projetos/$id/relatorio-monitoramento'
     | '/_app/atendidos/$id/'
     | '/_app/atendimentos/$id/'
     | '/_app/atividades/$id/'
@@ -673,6 +686,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAtendidosIdIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/projetos/$id/relatorio-monitoramento': {
+      id: '/_app/projetos/$id/relatorio-monitoramento'
+      path: '/projetos/$id/relatorio-monitoramento'
+      fullPath: '/projetos/$id/relatorio-monitoramento'
+      preLoaderRoute: typeof AppProjetosIdRelatorioMonitoramentoRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/projetos/$id/editar': {
       id: '/_app/projetos/$id/editar'
       path: '/projetos/$id/editar'
@@ -766,6 +786,7 @@ interface AppRouteChildren {
   AppEditaisIdEditarRoute: typeof AppEditaisIdEditarRoute
   AppGruposIdEditarRoute: typeof AppGruposIdEditarRoute
   AppProjetosIdEditarRoute: typeof AppProjetosIdEditarRoute
+  AppProjetosIdRelatorioMonitoramentoRoute: typeof AppProjetosIdRelatorioMonitoramentoRoute
   AppAtendidosIdIndexRoute: typeof AppAtendidosIdIndexRoute
   AppAtendimentosIdIndexRoute: typeof AppAtendimentosIdIndexRoute
   AppAtividadesIdIndexRoute: typeof AppAtividadesIdIndexRoute
@@ -802,6 +823,8 @@ const AppRouteChildren: AppRouteChildren = {
   AppEditaisIdEditarRoute: AppEditaisIdEditarRoute,
   AppGruposIdEditarRoute: AppGruposIdEditarRoute,
   AppProjetosIdEditarRoute: AppProjetosIdEditarRoute,
+  AppProjetosIdRelatorioMonitoramentoRoute:
+    AppProjetosIdRelatorioMonitoramentoRoute,
   AppAtendidosIdIndexRoute: AppAtendidosIdIndexRoute,
   AppAtendimentosIdIndexRoute: AppAtendimentosIdIndexRoute,
   AppAtividadesIdIndexRoute: AppAtividadesIdIndexRoute,
@@ -822,3 +845,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
