@@ -55,10 +55,26 @@ function LoginForm() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password: pw });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password: pw });
+    if (error) { setBusy(false); toast.error(error.message); return; }
+    // Verifica status do perfil antes de prosseguir
+    const uid = data.user?.id;
+    if (uid) {
+      const { data: prof } = await supabase.from("profiles").select("status").eq("id", uid).maybeSingle();
+      const st = (prof as any)?.status as string | undefined;
+      if (st === "bloqueado") {
+        await supabase.auth.signOut();
+        setBusy(false);
+        toast.error("Sua conta está bloqueada. Procure um administrador.");
+        return;
+      }
+      if (st && st !== "aprovado") {
+        // Mantém logado para mostrar a tela "pendente" do _app
+      }
+    }
     setBusy(false);
-    if (error) toast.error(error.message);
-    else { toast.success("Bem-vindo(a)!"); nav({ to: "/" }); }
+    toast.success("Bem-vindo(a)!");
+    nav({ to: "/" });
   }
 
   return (
