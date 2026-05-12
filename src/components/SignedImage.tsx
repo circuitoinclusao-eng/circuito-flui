@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { getSignedStorageUrl } from "@/lib/storage";
 
-interface Props extends React.ImgHTMLAttributes<HTMLImageElement> {
+type Props = Omit<React.ImgHTMLAttributes<HTMLImageElement>, "src"> & {
   /** URL antiga (pública) ou caminho no bucket. */
   src?: string | null;
   bucket?: string;
   path?: string;
   fallback?: React.ReactNode;
-}
+};
 
 /**
  * <SignedImage /> — exibe imagens armazenadas em buckets privados
