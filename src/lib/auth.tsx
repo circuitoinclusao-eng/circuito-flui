@@ -12,12 +12,16 @@ export const ROLE_LABELS: Record<Role, string> = {
   consulta: "Consulta",
 };
 
+export type ProfileStatus = "pendente" | "aprovado" | "bloqueado";
+
 interface AuthCtx {
   user: User | null;
   session: Session | null;
   loading: boolean;
   roles: Role[];
-  profile: { nome: string; email: string } | null;
+  profile: { nome: string; email: string; status: ProfileStatus } | null;
+  status: ProfileStatus | null;
+  isApproved: boolean;
   hasRole: (r: Role) => boolean;
   canEdit: boolean;
   isAdminOrCoord: boolean;
