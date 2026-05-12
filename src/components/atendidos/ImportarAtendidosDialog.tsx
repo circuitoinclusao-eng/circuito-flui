@@ -65,11 +65,11 @@ function norm(s: string) {
 }
 
 function detectDelimiter(sample: string): string {
-  const candidates = [";", ",", "\t", "|"];
+  const candidates = [";", ",", "\t"];
   let best = ",", max = 0;
-  const firstLines = sample.split("\n").slice(0, 5);
+  const firstLines = sample.split(/\r?\n/).filter((l) => l.trim()).slice(0, 10);
   for (const c of candidates) {
-    const counts = firstLines.map((l) => l.split(c).length - 1);
+    const counts = firstLines.map((l) => parseCSV(l, c)[0]?.length ?? 1);
     const score = Math.max(...counts);
     if (score > max) { max = score; best = c; }
   }
@@ -107,7 +107,6 @@ function detectHeaderRow(allRows: any[][]): number {
     const row = allRows[i] ?? [];
     const filled = row.map((c) => String(c ?? "").trim()).filter((c) => c !== "");
     if (filled.length < 2) continue;
-    // Skip title-like rows where every filled cell is identical (merged title).
     const uniq = new Set(filled.map((c) => c.toLowerCase()));
     if (uniq.size === 1) continue;
     let aliasHits = 0, score = 0;
@@ -122,7 +121,6 @@ function detectHeaderRow(allRows: any[][]): number {
     }
   }
   if (bestIdx === -1) {
-    // Fallback: first row with 2+ filled cells.
     for (let i = 0; i < allRows.length; i++) {
       const filled = (allRows[i] ?? []).filter((c) => String(c ?? "").trim() !== "").length;
       if (filled >= 2) return i;
@@ -241,6 +239,10 @@ export function ImportarAtendidosDialog({ open, onClose, onDone }: Props) {
   function loadCsv(text: string, d: string) {
     const all = parseCSV(text, d);
     if (!all.length) { toast.error("Arquivo vazio."); return; }
+    if ((all[0]?.length ?? 0) <= 1) {
+      toast.error("Nao foi possivel separar as colunas do CSV. Verifique se o arquivo usa ponto e virgula, virgula ou tabulacao.");
+      return;
+    }
     const idx = detectHeaderRow(all);
     setAllRows(all); setHeaderRowIdx(idx);
     applyHeaderRow(all, idx);
@@ -312,7 +314,6 @@ export function ImportarAtendidosDialog({ open, onClose, onDone }: Props) {
     }
     if (!valid.length) { setBusy(false); toast.error("Nenhum registro válido. Verifique o mapeamento (campo Nome é obrigatório)."); return; }
 
-    // Split: with id_externo (upsert) vs without (insert)
     const comId = valid.filter((o) => o.id_externo);
     const semId = valid.filter((o) => !o.id_externo);
 
