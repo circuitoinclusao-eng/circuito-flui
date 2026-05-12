@@ -7,7 +7,8 @@ import { CapaUpload } from "@/components/atividades/CapaUpload";
 import { CalendarioEncontros } from "@/components/atividades/CalendarioEncontros";
 import { ListaInscritos } from "@/components/atividades/ListaInscritos";
 import { GaleriaAtividade } from "@/components/atividades/GaleriaAtividade";
-import { Pencil, FileDown, Printer } from "lucide-react";
+import { RelatorioMensalDialog } from "@/components/atividades/RelatorioMensalDialog";
+import { Pencil, FileDown, Printer, FileText } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { downloadCSV, calcularIdade, statusEncontroLabel } from "@/lib/atividades";
 import { toast } from "sonner";
@@ -21,6 +22,9 @@ function AtividadeDetalhe() {
   const { canEdit } = useAuth();
   const [ativ, setAtiv] = useState<any>(null);
   const [projeto, setProjeto] = useState<any>(null);
+  const [educadores, setEducadores] = useState<string[]>([]);
+  const [gestores, setGestores] = useState<string[]>([]);
+  const [relMensalOpen, setRelMensalOpen] = useState(false);
 
   const load = useCallback(async () => {
     const { data: a } = await supabase.from("atividades").select("*").eq("id", id).maybeSingle();
@@ -31,6 +35,12 @@ function AtividadeDetalhe() {
     } else {
       setProjeto(null);
     }
+    const { data: edu } = await supabase
+      .from("atividade_educadores").select("usuario_id, profiles:usuario_id(nome)").eq("atividade_id", id);
+    setEducadores((edu ?? []).map((r: any) => r.profiles?.nome).filter(Boolean));
+    const { data: ges } = await supabase
+      .from("atividade_gestores").select("usuario_id, profiles:usuario_id(nome)").eq("atividade_id", id);
+    setGestores((ges ?? []).map((r: any) => r.profiles?.nome).filter(Boolean));
   }, [id]);
 
   useEffect(() => { load(); }, [load]);
