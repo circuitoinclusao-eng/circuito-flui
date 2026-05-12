@@ -37,6 +37,7 @@ export function AtividadeForm({ id, initial }: Props) {
   const [savedId, setSavedId] = useState<string | undefined>(id);
   const [educadores, setEducadores] = useState<string[]>([]);
   const [gestores, setGestores] = useState<string[]>([]);
+  const [diasSemana, setDiasSemana] = useState<number[]>([]);
 
   useEffect(() => {
     supabase.from("projetos").select("id,titulo,numero_projeto").order("titulo").then(({ data }) => setProjetos(data ?? []));
@@ -51,14 +52,13 @@ export function AtividadeForm({ id, initial }: Props) {
   }, [savedId]);
 
   async function syncVinculos(atividadeId: string) {
-    // educadores
     const { data: edExist } = await supabase.from("atividade_educadores").select("usuario_id").eq("atividade_id", atividadeId);
     const edAtuais = new Set((edExist ?? []).map((r: any) => r.usuario_id));
     const edNovos = educadores.filter((u) => !edAtuais.has(u));
     const edRemover = [...edAtuais].filter((u) => !educadores.includes(u as string));
     if (edNovos.length) await supabase.from("atividade_educadores").insert(edNovos.map((u) => ({ atividade_id: atividadeId, usuario_id: u })));
     if (edRemover.length) await supabase.from("atividade_educadores").delete().eq("atividade_id", atividadeId).in("usuario_id", edRemover as string[]);
-    // gestores
+
     const { data: gExist } = await supabase.from("atividade_gestores").select("usuario_id").eq("atividade_id", atividadeId);
     const gAtuais = new Set((gExist ?? []).map((r: any) => r.usuario_id));
     const gNovos = gestores.filter((u) => !gAtuais.has(u));
@@ -108,9 +108,68 @@ export function AtividadeForm({ id, initial }: Props) {
     nav({ to: "/atividades" });
   }
 
+  async function gerarCalendarioAulas() {
+    if (!savedId) {
+      toast.error("Salve a atividade antes de gerar o calendário.");
+      return;
+    }
+    if (!v.data_inicio || !v.data_fim) {
+      toast.error("Informe a data inicial e a data final.");
+      return;
+    }
+    if (!diasSemana.length) {
+      toast.error("Selecione pelo menos um dia da semana.");
+      return;
+    }
+    const inicio = new Date(`${v.data_inicio}T00:00:00`);
+    const fim = new Date(`${v.data_fim}T00:00:00`);
+    if (Number.isNaN(inicio.getTime()) || Number.isNaN(fim.getTime()) || inicio > fim) {
+      toast.error("Confira o período informado.");
+      return;
+    }
+
+    const periodo =
+      v.periodo_matutino ? "matutino" :
+      v.periodo_vespertino ? "vespertino" :
+      v.periodo_noturno ? "noturno" :
+      null;
+
+    const { data: existentes } = await supabase
+      .from("encontros_atividade")
+      .select("data,horario_inicio,horario_fim")
+      .eq("atividade_id", savedId);
+    const chavesExistentes = new Set((existentes ?? []).map((e: any) =>
+      `${e.data}|${e.horario_inicio ?? ""}|${e.horario_fim ?? ""}`
+    ));
+
+    const encontros = [];
+    for (const d = new Date(inicio); d <= fim; d.setDate(d.getDate() + 1)) {
+      if (!diasSemana.includes(d.getDay())) continue;
+      const data = d.toISOString().slice(0, 10);
+      const chave = `${data}|${v.horario_inicio ?? ""}|${v.horario_fim ?? ""}`;
+      if (chavesExistentes.has(chave)) continue;
+      encontros.push({
+        atividade_id: savedId,
+        data,
+        horario_inicio: v.horario_inicio || null,
+        horario_fim: v.horario_fim || null,
+        periodo,
+        status: "nao_registrada",
+      });
+    }
+
+    if (!encontros.length) {
+      toast.info("Nenhum novo encontro para gerar nesse período.");
+      return;
+    }
+
+    const { error } = await supabase.from("encontros_atividade").insert(encontros);
+    if (error) toast.error(error.message);
+    else toast.success(`${encontros.length} aula(s) gerada(s) no calendário.`);
+  }
+
   return (
     <form onSubmit={(e) => submit(e, false)} className="space-y-6">
-      {/* BLOCO 1 - Dados gerais */}
       <Section title="1. Dados gerais">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="md:col-span-2">
@@ -165,7 +224,6 @@ export function AtividadeForm({ id, initial }: Props) {
         </div>
       </Section>
 
-      {/* BLOCO 2 - Responsáveis */}
       <Section title="2. Responsáveis">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -184,7 +242,6 @@ export function AtividadeForm({ id, initial }: Props) {
         </div>
       </Section>
 
-      {/* BLOCO 3 - Configurações */}
       <Section title="3. Configurações da atividade">
         <div className="space-y-4">
           <div className="flex items-center justify-between border-b pb-3">
@@ -231,7 +288,6 @@ export function AtividadeForm({ id, initial }: Props) {
         </div>
       </Section>
 
-      {/* BLOCO 4 - Período */}
       <Section title="4. Período de ocorrência">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -241,6 +297,40 @@ export function AtividadeForm({ id, initial }: Props) {
           <div>
             <Label>Data final</Label>
             <Input type="date" value={v.data_fim ?? ""} onChange={(e) => set("data_fim", e.target.value)} />
+          </div>
+          <div>
+            <Label>Horário início</Label>
+            <Input type="time" value={v.horario_inicio ?? ""} onChange={(e) => set("horario_inicio", e.target.value)} />
+          </div>
+          <div>
+            <Label>Horário fim</Label>
+            <Input type="time" value={v.horario_fim ?? ""} onChange={(e) => set("horario_fim", e.target.value)} />
+          </div>
+          <div className="md:col-span-2">
+            <Label className="mb-2 block">Dias da semana</Label>
+            <div className="flex flex-wrap gap-3">
+              {[
+                { v: 1, l: "Seg" },
+                { v: 2, l: "Ter" },
+                { v: 3, l: "Qua" },
+                { v: 4, l: "Qui" },
+                { v: 5, l: "Sex" },
+                { v: 6, l: "Sáb" },
+                { v: 0, l: "Dom" },
+              ].map((d) => (
+                <label key={d.v} className="flex items-center gap-2 cursor-pointer">
+                  <Checkbox
+                    checked={diasSemana.includes(d.v)}
+                    onCheckedChange={(c) => {
+                      setDiasSemana((atuais) =>
+                        c ? [...atuais, d.v].sort() : atuais.filter((x) => x !== d.v)
+                      );
+                    }}
+                  />
+                  <span>{d.l}</span>
+                </label>
+              ))}
+            </div>
           </div>
           <div className="md:col-span-2">
             <Label className="mb-2 block">Em qual(is) período(s) ocorrerá?</Label>
@@ -257,10 +347,14 @@ export function AtividadeForm({ id, initial }: Props) {
               ))}
             </div>
           </div>
+          <div className="md:col-span-2 flex justify-end">
+            <Button type="button" variant="outline" onClick={gerarCalendarioAulas}>
+              Gerar calendário de aulas
+            </Button>
+          </div>
         </div>
       </Section>
 
-      {/* BLOCO 5 - Imagens */}
       <Section title="5. Imagens">
         {savedId ? (
           <CapaUpload
@@ -275,7 +369,6 @@ export function AtividadeForm({ id, initial }: Props) {
         )}
       </Section>
 
-      {/* Botões */}
       <div className="flex flex-wrap gap-2 justify-end pt-4 border-t bg-card sticky bottom-0 -mx-4 px-4 py-3 rounded-b-xl">
         {savedId && (
           <Button type="button" variant="destructive" onClick={excluir}>Excluir</Button>
