@@ -42,7 +42,7 @@ function Dashboard() {
   const [stats, setStats] = useState({
     atividadesSemana: 0,
     chamadasPendentes: 0,
-    participantesAtivos: 0,
+    pessoasAtendidas: 0,
     projetosAtivos: 0,
   });
   const [encontrosSemana, setEncontrosSemana] = useState<any[]>([]);
@@ -58,7 +58,6 @@ function Dashboard() {
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [user?.id]);
 
   async function load() {
-    // Se for somente Professor, restringe às atividades em que está vinculado
     let atividadeIds: string[] | null = null;
     let atendidoIds: string[] | null = null;
     let projetoIds: string[] | null = null;
@@ -87,8 +86,8 @@ function Dashboard() {
       .eq("status", "nao_registrada").lt("data", iso(hoje)).order("data", { ascending: false }).limit(8);
     if (atividadeIds) qPend.in("atividade_id", atividadeIds);
 
-    const qAtivos = supabase.from("atendidos").select("*", { count: "exact", head: true }).eq("status", "ativo");
-    if (atendidoIds) qAtivos.in("id", atendidoIds);
+    const qPessoasAtendidas = supabase.from("atendidos").select("*", { count: "exact", head: true });
+    if (atendidoIds) qPessoasAtendidas.in("id", atendidoIds);
 
     const qProjAtivos = supabase.from("projetos").select("*", { count: "exact", head: true })
       .in("status", ["em_execucao", "aprovado"]);
@@ -125,9 +124,9 @@ function Dashboard() {
     if (atividadeIds) qPresMes.in("atividade_id", atividadeIds);
 
     const [
-      semana, pend, ativAtivos, projAtivos, docs, projFinal, aniv, faltasRows, cidadeRows, modRows, presMes,
+      semana, pend, pessoasAtendidas, projAtivos, docs, projFinal, aniv, faltasRows, cidadeRows, modRows, presMes,
     ] = await Promise.all([
-      qSemana, qPend, qAtivos, qProjAtivos, qDocs, qProjFim, qAniv, qFaltas, qCidade, qMod, qPresMes,
+      qSemana, qPend, qPessoasAtendidas, qProjAtivos, qDocs, qProjFim, qAniv, qFaltas, qCidade, qMod, qPresMes,
     ]);
 
     setEncontrosSemana(semana.data ?? []);
@@ -138,18 +137,16 @@ function Dashboard() {
     setStats({
       atividadesSemana: (semana.data ?? []).length,
       chamadasPendentes: (pend.data ?? []).length,
-      participantesAtivos: ativAtivos.count ?? 0,
+      pessoasAtendidas: pessoasAtendidas.count ?? 0,
       projetosAtivos: projAtivos.count ?? 0,
     });
 
-    // Aniversariantes do mês
     const ans = (aniv.data ?? []).filter((p: any) => {
       const d = new Date(p.data_nascimento);
       return d.getMonth() + 1 === mesAtual;
     }).sort((a: any, b: any) => new Date(a.data_nascimento).getDate() - new Date(b.data_nascimento).getDate());
     setAniversariantes(ans.slice(0, 10));
 
-    // Top faltosos
     const counts: Record<string, { nome: string; n: number }> = {};
     (faltasRows.data ?? []).forEach((r: any) => {
       const id = r.atendido_id;
@@ -158,7 +155,6 @@ function Dashboard() {
     });
     setTopFaltosos(Object.entries(counts).map(([id, v]) => ({ id, ...v })).sort((a, b) => b.n - a.n).slice(0, 6));
 
-    // Por cidade
     const cMap: Record<string, number> = {};
     (cidadeRows.data ?? []).forEach((r: any) => {
       const c = r.cidade || "Não informado";
@@ -166,7 +162,6 @@ function Dashboard() {
     });
     setPorCidade(Object.entries(cMap).map(([cidade, total]) => ({ cidade, total })).sort((a, b) => b.total - a.total).slice(0, 6));
 
-    // Por modalidade
     const mMap: Record<string, number> = {};
     (modRows.data ?? []).forEach((r: any) => {
       const t = r.tipo || "Não informado";
@@ -174,7 +169,6 @@ function Dashboard() {
     });
     setPorModalidade(Object.entries(mMap).map(([modalidade, total]) => ({ modalidade, total })).sort((a, b) => b.total - a.total).slice(0, 8));
 
-    // Presença últimos 6 meses
     const pm: Record<string, number> = {};
     for (let i = 5; i >= 0; i--) {
       const d = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
@@ -198,16 +192,14 @@ function Dashboard() {
         <p className="text-sm text-muted-foreground -mt-2 mb-4">Mostrando apenas as atividades em que você é educador.</p>
       )}
 
-      {/* KPIs prioritários */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
         <StatCard label="Atividades da semana" value={stats.atividadesSemana} icon={CalendarRange} to="/atividades" variant="blue" />
         <StatCard label="Chamadas pendentes" value={stats.chamadasPendentes} icon={ClipboardCheck} variant="amber" />
-        <StatCard label="Participantes ativos" value={stats.participantesAtivos} icon={Users} to="/atendidos" variant="lilac" />
+        <StatCard label="Pessoas atendidas" value={stats.pessoasAtendidas} icon={Users} to="/atendidos" variant="lilac" />
         <StatCard label="Projetos ativos" value={stats.projetosAtivos} icon={FolderKanban} to="/projetos" variant="teal" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-        {/* Coluna principal */}
         <div className="lg:col-span-2 space-y-4 md:space-y-6">
           <SectionCard title="Atividades desta semana">
             {encontrosSemana.length === 0 ? (
@@ -282,7 +274,6 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* Coluna lateral - alertas */}
         <div className="space-y-4 md:space-y-6">
           <SectionCard title="Chamadas pendentes" action={<AlertCircle className="w-4 h-4 text-warning" />}>
             {chamadasPend.length === 0 ? (
