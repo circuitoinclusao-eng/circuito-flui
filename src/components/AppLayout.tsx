@@ -22,6 +22,7 @@ const NAV = [
   { to: "/grupos", label: "Grupos / Turmas", icon: Users },
   { to: "/contatos", label: "Contatos", icon: Contact },
   { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
+  { to: "/bussola", label: "Bússola PCD", icon: Compass },
   { to: "/configuracoes", label: "Configurações", icon: Settings },
 ] as const;
 
