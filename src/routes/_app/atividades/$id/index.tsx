@@ -155,6 +155,8 @@ function AtividadeDetalhe() {
         )}
         <Stat label="Períodos" value={[ativ.periodo_matutino && "Matutino", ativ.periodo_vespertino && "Vespertino", ativ.periodo_noturno && "Noturno"].filter(Boolean).join(", ") || "—"} />
         {ativ.local && <Stat label="Local" value={ativ.local} />}
+        <Stat label="Educadores" value={educadores.length ? educadores.join(", ") : "—"} />
+        <Stat label="Gestores" value={gestores.length ? gestores.join(", ") : "—"} />
       </div>
 
       {ativ.descricao && (
@@ -169,6 +171,8 @@ function AtividadeDetalhe() {
         <ListaInscritos atividadeId={id} canEdit={canEdit} numeroVagas={ativ.numero_vagas} />
         <GaleriaAtividade atividadeId={id} canEdit={canEdit} />
       </div>
+
+      <RelatorioMensalDialog open={relMensalOpen} onClose={() => setRelMensalOpen(false)} atividadeId={id} />
     </>
   );
 }
